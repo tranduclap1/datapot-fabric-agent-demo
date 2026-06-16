@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Branch & Channel Performance"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ef9f8799-8bba-4f74-898f-9671ce1fe534"
+  }
+}

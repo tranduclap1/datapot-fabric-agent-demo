@@ -1,0 +1,97 @@
+table 'NPS Surveys'
+	lineageTag: 70c03b0a-b264-4202-af3e-7ceb6ecd19bc
+
+	column 'Survey ID'
+		dataType: string
+		isHidden
+		lineageTag: 761969c9-3705-41ad-bde8-d53e5608aca3
+		summarizeBy: none
+		sourceColumn: SurveyID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Survey Date'
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: b1f8f4b6-8307-4b3d-a05a-b4a4740425f5
+		summarizeBy: none
+		sourceColumn: SurveyDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: 6752dba2-629e-466f-834a-183d40f6be2e
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Branch ID'
+		dataType: string
+		isHidden
+		lineageTag: 20da000c-1b20-4649-a5db-3000664f94cb
+		summarizeBy: none
+		sourceColumn: BranchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Score
+		dataType: int64
+		isHidden
+		lineageTag: 3c468248-6476-4aa3-951b-1445298111a6
+		summarizeBy: none
+		sourceColumn: Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'NPS Category'
+		dataType: string
+		lineageTag: 0544408b-7b30-419d-a489-4ed0f596c355
+		summarizeBy: none
+		sourceColumn: NPSCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Primary Reason ID'
+		dataType: string
+		isHidden
+		lineageTag: ff52f9ff-ae9f-4a93-aefd-1b142b0bc2c1
+		summarizeBy: none
+		sourceColumn: PrimaryReasonID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Primary Reason'
+		dataType: string
+		lineageTag: c41d3c95-e7ed-4c0b-97d7-a1061b3ba8e5
+		summarizeBy: none
+		sourceColumn: PrimaryReason
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'NPS Surveys' = m
+		mode: import
+		source =
+				let
+				    Source = Folder.Files(DataFolder & "\NPSSurveys"),
+				    OnlyCsv = Table.SelectRows(Source, each [Extension] = ".csv"),
+				    AddData = Table.AddColumn(OnlyCsv, "Data", each Table.PromoteHeaders(Csv.Document([Content], [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]), [PromoteAllScalars = true])),
+				    Combined = Table.Combine(AddData[Data]),
+				    Typed = Table.TransformColumnTypes(Combined, {
+				        {"SurveyID", type text},
+				        {"SurveyDate", type date},
+				        {"CustomerID", type text},
+				        {"BranchID", type text},
+				        {"Score", Int64.Type},
+				        {"NPSCategory", type text},
+				        {"PrimaryReasonID", type text},
+				        {"PrimaryReason", type text}
+				    })
+				in
+				    Typed
+

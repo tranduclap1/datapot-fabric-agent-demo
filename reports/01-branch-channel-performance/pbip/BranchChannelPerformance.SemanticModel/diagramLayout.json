@@ -1,0 +1,152 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 1.6000000238418579,
+        "y": 400
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1282.8147176143866,
+            "y": 433.08197855494814
+          },
+          "nodeIndex": "Key Measures",
+          "nodeLineageTag": "4106266d-34c1-4ba0-be7a-51d5dc925031",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 336.0266816292721,
+            "y": 237.61377021631426
+          },
+          "nodeIndex": "Branch",
+          "nodeLineageTag": "9d2363db-1533-4f82-9ec8-f14ce148b85a",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 522.91256175749209,
+            "y": -50
+          },
+          "nodeIndex": "Branch Targets",
+          "nodeLineageTag": "b85a125c-d23d-4bad-91da-fe614d25358e",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 907.047527664589,
+            "y": 128.48001378394906
+          },
+          "nodeIndex": "Channel",
+          "nodeLineageTag": "94ec624c-5949-4213-9db1-f140187d9fd2",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 166.3808529437265,
+            "y": 597.02000107962124
+          },
+          "nodeIndex": "Customer",
+          "nodeLineageTag": "ee08ec45-dbd4-423c-831f-27f923ea6361",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 621.47952936819479,
+            "y": 179.07720646763926
+          },
+          "nodeIndex": "Date",
+          "nodeLineageTag": "900868dd-79c5-4d18-99f9-61ed97c546a2",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 271.47222830124394
+          },
+          "nodeIndex": "NPS Surveys",
+          "nodeLineageTag": "70c03b0a-b264-4202-af3e-7ceb6ecd19bc",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 673.3789279797536,
+            "y": 916.163957109896
+          },
+          "nodeIndex": "Product",
+          "nodeLineageTag": "a094b2bd-ae10-41dd-99e5-039b6bab5b96",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1048.8147176143866,
+            "y": 868.55418667960691
+          },
+          "nodeIndex": "Transaction Type",
+          "nodeLineageTag": "e6b57648-de99-4313-9125-7cbdcaf0bb5e",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 761.76879614207508,
+            "y": 532.81338883058856
+          },
+          "nodeIndex": "Transactions",
+          "nodeLineageTag": "b5a9cfc8-7a35-457c-9192-604640c4415f",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

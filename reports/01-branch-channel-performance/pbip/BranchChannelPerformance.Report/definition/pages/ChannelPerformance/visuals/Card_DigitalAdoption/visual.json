@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "8bb1e302814a37194899",
+  "position": {
+    "x": 16,
+    "y": 100,
+    "z": 1,
+    "height": 92,
+    "width": 300,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Key Measures"
+                    }
+                  },
+                  "Property": "Digital Adoption %"
+                }
+              },
+              "queryRef": "Key Measures.Digital Adoption %",
+              "nativeQueryRef": "Digital Adoption %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

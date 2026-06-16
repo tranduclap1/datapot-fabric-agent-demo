@@ -1,0 +1,113 @@
+table Date
+	lineageTag: 900868dd-79c5-4d18-99f9-61ed97c546a2
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd mmm yyyy
+		lineageTag: d8d1bc82-5eb1-4f4c-912d-05a45cf620c1
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		lineageTag: 2759b5db-edd1-420d-948f-11f34cb338fa
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 68fdbb39-ea9f-49df-bb11-18fb164b25cd
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		isHidden
+		lineageTag: da942f58-e881-43fa-97d8-a5acbe0a9a16
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: dae5204e-545c-4904-9833-8faf16aede41
+		summarizeBy: none
+		sourceColumn: MonthName
+		sortByColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year'
+		dataType: string
+		lineageTag: 7b04e2f2-8a68-4ae7-b88b-cfa787aac85c
+		summarizeBy: none
+		sourceColumn: MonthYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Of Week'
+		dataType: string
+		lineageTag: 924f91bc-975c-467f-93d4-90493cdcbb5e
+		summarizeBy: none
+		sourceColumn: DayOfWeek
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		dataType: boolean
+		lineageTag: 8a17035f-ba5c-46db-96cf-1b1f60d1aa5d
+		summarizeBy: none
+		sourceColumn: IsWeekend
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Calendar Hierarchy'
+		lineageTag: 2c48a3fe-b02e-4979-83de-87fe955c9ca3
+
+		level Year
+			lineageTag: 0e2d5932-21e2-4af9-8328-ab30ba5ae213
+			column: Year
+
+		level Quarter
+			lineageTag: ef062bd6-eb59-44c9-904c-863e70a8a035
+			column: Quarter
+
+		level Month
+			lineageTag: b44ca5ad-5a7b-4cca-bb64-3be7838aa4c3
+			column: 'Month Name'
+
+		level Date
+			lineageTag: 67f35c89-f8d6-47fc-88f9-a2b80afb99a4
+			column: Date
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\Dimensions\BankDIAD_Dimensions.xlsx"), null, true),
+				    Sheet = Source{[Item="DimDate", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"Date", type date},
+				        {"Year", Int64.Type},
+				        {"Quarter", type text},
+				        {"Month", Int64.Type},
+				        {"MonthName", type text},
+				        {"MonthYear", type text},
+				        {"DayOfWeek", type text},
+				        {"IsWeekend", type logical}
+				    })
+				in
+				    Typed
+

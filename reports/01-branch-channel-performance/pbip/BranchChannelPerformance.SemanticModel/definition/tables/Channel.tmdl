@@ -1,0 +1,52 @@
+table Channel
+	lineageTag: 94ec624c-5949-4213-9db1-f140187d9fd2
+
+	column 'Channel ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 842b72bb-0f76-4ceb-89ad-fe06ea8e3ffc
+		summarizeBy: none
+		sourceColumn: ChannelID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Channel Name'
+		dataType: string
+		lineageTag: ce21601b-bc7f-4b00-9895-8d75c16c1356
+		summarizeBy: none
+		sourceColumn: ChannelName
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Channel Type'
+		dataType: string
+		lineageTag: 4ed1eea9-3e69-4014-849e-2c3496e7a2d1
+		summarizeBy: none
+		sourceColumn: ChannelType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Digital'
+		dataType: boolean
+		lineageTag: f099ac70-122e-4de9-ba63-1361798e492b
+		summarizeBy: none
+		sourceColumn: IsDigital
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Channel = m
+		mode: import
+		source =
+				let
+				    Source = Table.Distinct(Table.SelectColumns(Transactions, {"ChannelID", "ChannelName"})),
+				    Sorted = Table.Sort(Source, {{"ChannelID", Order.Ascending}}),
+				    WithType = Table.AddColumn(Sorted, "ChannelType", each
+				        if [ChannelName] = "Internet Banking" or [ChannelName] = "Mobile Banking" then "Digital"
+				        else if [ChannelName] = "ATM" then "Self-Service"
+				        else if [ChannelName] = "Phone Banking" then "Assisted"
+				        else "Branch", type text),
+				    WithDigital = Table.AddColumn(WithType, "IsDigital", each [ChannelType] = "Digital", type logical)
+				in
+				    WithDigital
+

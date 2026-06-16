@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Branch & Channel Performance"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d87f7695-b89a-4ebe-8d4a-d1e588fb2b1d"
+  }
+}

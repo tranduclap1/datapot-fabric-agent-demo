@@ -1,0 +1,87 @@
+object_type,table,model_name,source_column,data_type,hidden,key,description_or_dax
+column,Date,Date,Date,dateTime,no,yes,Calendar date relationship key
+column,Date,Year,Year,int64,no,no,Calendar year
+column,Date,Quarter,Quarter,string,no,no,Q1-Q4
+column,Date,Month,Month,int64,yes,no,Month number sort key
+column,Date,Month Name,MonthName,string,no,no,Sorted by Month
+column,Date,Month Year,MonthYear,string,no,no,YYYY-MM chronological trend axis
+column,Date,Day Of Week,DayOfWeek,string,no,no,Weekday name
+column,Date,Is Weekend,IsWeekend,boolean,no,no,Weekend flag
+column,Branch,Branch ID,BranchID,string,yes,yes,B001-B050
+column,Branch,Branch Name,BranchName,string,no,no,Branch display name
+column,Branch,City,City,string,no,no,Trimmed
+column,Branch,District,District,string,no,no,District
+column,Branch,Region,Region,string,no,no,Bac/Trung/Nam
+column,Branch,Branch Type,BranchType,string,no,no,Digital/Hub/Spoke
+column,Branch,Open Date,OpenDate,dateTime,no,no,Opening date
+column,Branch,Manager,Manager,string,no,no,Branch manager
+column,Product,Product ID,ProductID,string,yes,yes,Product key
+column,Product,Product Name,ProductName,string,no,no,Product name
+column,Product,Product Category,ProductCategory,string,no,no,Card/Deposit/Loan/Wealth
+column,Product,Product Sub Category,ProductSubCategory,string,no,no,Sub category
+column,Product,Base Rate,BaseRate,double,no,no,Base rate percent
+column,Customer,Customer ID,CustomerID,string,yes,yes,Customer key
+column,Customer,Full Name,FullName,string,no,no,Customer name
+column,Customer,Gender,Gender,string,no,no,Nam/Nu
+column,Customer,Date Of Birth,DateOfBirth,dateTime,yes,no,DOB
+column,Customer,Age,Age,int64,no,no,Age
+column,Customer,Occupation,Occupation,string,no,no,Occupation
+column,Customer,City,City,string,no,no,Customer city
+column,Customer,Home Branch ID,HomeBranchID,string,yes,no,Home branch (not related to Branch)
+column,Customer,Segment,Segment,string,no,no,Mass/Affluent/Priority/Private
+column,Customer,Join Date,JoinDate,dateTime,no,no,Join date
+column,Customer,KYC Status,KYCStatus,string,no,no,KYC status
+column,Channel,Channel ID,ChannelID,string,yes,yes,CH1-CH6
+column,Channel,Channel Name,ChannelName,string,no,no,Channel display name
+column,Channel,Channel Type,ChannelType,string,no,no,Derived Digital/Self-Service/Assisted/Branch
+column,Channel,Is Digital,IsDigital,boolean,no,no,Derived TRUE for Internet/Mobile
+column,Transaction Type,Transaction Type ID,TransactionTypeID,string,yes,yes,T01-T08
+column,Transaction Type,Transaction Type Name,TransactionTypeName,string,no,no,Type name
+column,Transaction Type,Transaction Category,TransactionCategory,string,no,no,Derived Cash/Transfer/Payment/Income/Loan Repayment
+column,Transactions,Transaction ID,TransactionID,string,yes,no,Transaction key
+column,Transactions,Date,Date,dateTime,yes,no,Relates to Date
+column,Transactions,Customer ID,CustomerID,string,yes,no,Relates to Customer
+column,Transactions,Product ID,ProductID,string,yes,no,Relates to Product
+column,Transactions,Branch ID,BranchID,string,yes,no,Relates to Branch
+column,Transactions,Channel ID,ChannelID,string,yes,no,Relates to Channel
+column,Transactions,Channel Name,ChannelName,string,yes,no,Denormalized
+column,Transactions,Transaction Type ID,TransactionTypeID,string,yes,no,Relates to Transaction Type
+column,Transactions,Transaction Type Name,TransactionTypeName,string,yes,no,Denormalized
+column,Transactions,Direction,Direction,string,no,no,Credit/Debit
+column,Transactions,Amount (VND),Amount_VND,int64,yes,no,Signed amount
+column,Transactions,Fee (VND),Fee_VND,int64,yes,no,Fee charged
+column,Transactions,Service Time (min),ServiceTimeMinutes,double,yes,no,May be blank
+column,NPS Surveys,Survey ID,SurveyID,string,yes,no,Survey key
+column,NPS Surveys,Survey Date,SurveyDate,dateTime,yes,no,Relates to Date
+column,NPS Surveys,Customer ID,CustomerID,string,yes,no,Relates to Customer
+column,NPS Surveys,Branch ID,BranchID,string,yes,no,Relates to Branch
+column,NPS Surveys,Score,Score,int64,yes,no,0-10
+column,NPS Surveys,NPS Category,NPSCategory,string,no,no,Promoter/Passive/Detractor
+column,NPS Surveys,Primary Reason ID,PrimaryReasonID,string,yes,no,R01-R08
+column,NPS Surveys,Primary Reason,PrimaryReason,string,no,no,Reason text
+column,Branch Targets,Branch ID,BranchID,string,yes,no,Relates to Branch
+column,Branch Targets,Target Type,TargetType,string,no,no,Total Revenue (VND)/CASA Balance (VND)
+column,Branch Targets,Month,Month,dateTime,yes,no,Relates to Date 1st of month
+column,Branch Targets,Target Value,TargetValue,double,yes,no,Monthly target amount
+measure,Key Measures,Total Transactions,,,no,,COUNTROWS(Transactions)
+measure,Key Measures,Active Customers,,,no,,DISTINCTCOUNT(Transactions[Customer ID])
+measure,Key Measures,Total Inflow,,,no,,CALCULATE(SUM(Transactions[Amount (VND)]) Direction=Credit)
+measure,Key Measures,Total Outflow,,,no,,CALCULATE(-1*SUM(Transactions[Amount (VND)]) Direction=Debit)
+measure,Key Measures,Net Flow,,,no,,[Total Inflow]-[Total Outflow]
+measure,Key Measures,Gross Transaction Value,,,no,,[Total Inflow]+[Total Outflow]
+measure,Key Measures,Avg Transaction Size,,,no,,DIVIDE([Gross Transaction Value] [Total Transactions])
+measure,Key Measures,Fee Revenue,,,no,,SUM(Transactions[Fee (VND)])
+measure,Key Measures,Revenue Target,,,no,,CALCULATE(SUM(Branch Targets[Target Value]) Type=Total Revenue)
+measure,Key Measures,CASA Balance Target,,,no,,CALCULATE(SUM(Branch Targets[Target Value]) Type=CASA Balance)
+measure,Key Measures,Avg Service Time (min),,,no,,AVERAGE(Transactions[Service Time (min)])
+measure,Key Measures,Survey Responses,,,no,,COUNTROWS(NPS Surveys)
+measure,Key Measures,Promoters,,,yes,,CALCULATE(COUNTROWS(NPS Surveys) Category=Promoter)
+measure,Key Measures,Detractors,,,yes,,CALCULATE(COUNTROWS(NPS Surveys) Category=Detractor)
+measure,Key Measures,NPS,,,no,,DIVIDE([Promoters]-[Detractors] [Survey Responses])*100
+measure,Key Measures,Avg NPS Score,,,no,,AVERAGE(NPS Surveys[Score])
+measure,Key Measures,Digital Transactions,,,no,,CALCULATE([Total Transactions] Channel[Is Digital]=TRUE)
+measure,Key Measures,Digital Adoption %,,,no,,DIVIDE([Digital Transactions] [Total Transactions])
+measure,Key Measures,Transactions PM,,,no,,CALCULATE([Total Transactions] DATEADD(Date[Date] -1 MONTH))
+measure,Key Measures,Transactions MoM %,,,no,,DIVIDE([Total Transactions]-[Transactions PM] [Transactions PM])
+measure,Key Measures,Transactions YTD,,,no,,TOTALYTD([Total Transactions] Date[Date])
+measure,Key Measures,Fee Revenue YTD,,,no,,TOTALYTD([Fee Revenue] Date[Date])

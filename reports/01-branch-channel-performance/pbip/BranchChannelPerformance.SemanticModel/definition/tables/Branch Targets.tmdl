@@ -1,0 +1,60 @@
+table 'Branch Targets'
+	lineageTag: b85a125c-d23d-4bad-91da-fe614d25358e
+
+	column 'Branch ID'
+		dataType: string
+		isHidden
+		lineageTag: d54983cf-e9e9-4ea0-9a0b-d25e0529a8fc
+		summarizeBy: none
+		sourceColumn: BranchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Target Type'
+		dataType: string
+		lineageTag: 2e5ba1ba-dcf7-4fa2-b6d1-ec66ef2a5a2a
+		summarizeBy: none
+		sourceColumn: TargetType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 0a326031-58a1-47da-88bf-7841ceddfe4f
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Target Value'
+		dataType: double
+		isHidden
+		formatString: #,##0
+		lineageTag: 47b893b3-215b-43cd-a0d5-329fb2d96598
+		summarizeBy: sum
+		sourceColumn: TargetValue
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Branch Targets' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\Targets\BranchTargets.xlsx"), null, true),
+				    Sheet = Source{[Item="MonthlyTargets", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    Unpivot = Table.UnpivotOtherColumns(Promoted, {"BranchID", "BranchName", "TargetType"}, "MonthKey", "TargetValue"),
+				    AddMonth = Table.AddColumn(Unpivot, "Month", each Date.FromText(Text.Start(Text.From([MonthKey]), 7) & "-01"), type date),
+				    Typed = Table.TransformColumnTypes(AddMonth, {
+				        {"BranchID", type text},
+				        {"TargetType", type text},
+				        {"TargetValue", type number}
+				    }),
+				    Cleaned = Table.RemoveColumns(Typed, {"BranchName", "MonthKey"})
+				in
+				    Cleaned
+

@@ -1,0 +1,124 @@
+table Customer
+	lineageTag: ee08ec45-dbd4-423c-831f-27f923ea6361
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: dd040442-0028-42ca-8ab3-7e6b4c3e643b
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Full Name'
+		dataType: string
+		lineageTag: 782c3115-e151-4bc9-805c-85ce889aba9c
+		summarizeBy: none
+		sourceColumn: FullName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 2c6aeeae-fda4-4806-bcae-be6a58bb4e04
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date Of Birth'
+		dataType: dateTime
+		isHidden
+		formatString: dd mmm yyyy
+		lineageTag: d64e662e-de15-4b9e-9e91-6abe0f2bea2c
+		summarizeBy: none
+		sourceColumn: DateOfBirth
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Age
+		dataType: int64
+		lineageTag: 6cd68689-8abc-4282-a01d-a7d3d63198d2
+		summarizeBy: none
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column Occupation
+		dataType: string
+		lineageTag: 466b0ad2-f272-4546-83a6-27f3f65a3e24
+		summarizeBy: none
+		sourceColumn: Occupation
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 6455421c-b159-4081-8d44-d6bc3075f4c1
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Home Branch ID'
+		dataType: string
+		isHidden
+		lineageTag: 4e6bc3b3-ff30-4d18-8699-81816ea4b00a
+		summarizeBy: none
+		sourceColumn: HomeBranchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 1ba627b3-291a-4cd7-a133-dd5366cf487f
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Join Date'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: e1faed24-7c98-4437-a887-ecabbb2cff43
+		summarizeBy: none
+		sourceColumn: JoinDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'KYC Status'
+		dataType: string
+		lineageTag: 4487f888-d70e-4830-aaef-f3f4b11b2c9d
+		summarizeBy: none
+		sourceColumn: KYCStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\Dimensions\BankDIAD_Dimensions.xlsx"), null, true),
+				    Sheet = Source{[Item="DimCustomer", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"CustomerID", type text},
+				        {"FullName", type text},
+				        {"Gender", type text},
+				        {"DateOfBirth", type date},
+				        {"Age", Int64.Type},
+				        {"Occupation", type text},
+				        {"City", type text},
+				        {"HomeBranchID", type text},
+				        {"Segment", type text},
+				        {"JoinDate", type date},
+				        {"KYCStatus", type text}
+				    })
+				in
+				    Typed
+

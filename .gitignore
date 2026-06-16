@@ -1,0 +1,21 @@
+# --- Power BI Project (PBIP) local state ---
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/*.abf
+
+# --- OS / editor noise ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*~
+
+# --- Datasets ---
+# By default the pasted source data IS kept in the repo (the user asked for each report's
+# dataset to be retained for future reference). If a report's raw data is large or sensitive,
+# uncomment the matching line to exclude it (the dataset/samples/ folder should stay committed
+# so the model can still be profiled / built in CI):
+# reports/*/dataset/raw/*.csv
+# reports/*/dataset/raw/*.parquet
+# reports/*/dataset/raw/*.xlsx

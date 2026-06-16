@@ -1,0 +1,108 @@
+table Branch
+	lineageTag: 9d2363db-1533-4f82-9ec8-f14ce148b85a
+
+	column 'Branch ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: a3f24e73-5b1b-4f2b-b219-41e5b7ad05cc
+		summarizeBy: none
+		sourceColumn: BranchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Branch Name'
+		dataType: string
+		lineageTag: fb5bd690-bb9c-4afd-8b5e-b77cec095cce
+		summarizeBy: none
+		sourceColumn: BranchName
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 1cc6fd9d-dc9e-44ac-9245-da8ab518ae40
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column District
+		dataType: string
+		lineageTag: fcc071b2-7820-4289-a53e-4bc6427761c6
+		summarizeBy: none
+		sourceColumn: District
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 3bae8430-8c73-4dc4-85c8-c4ab103d9c98
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Branch Type'
+		dataType: string
+		lineageTag: b724866e-0e2f-479c-944f-5d3a2574908d
+		summarizeBy: none
+		sourceColumn: BranchType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Open Date'
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: ee7018cb-4f76-460e-a265-7c0cabacc3d0
+		summarizeBy: none
+		sourceColumn: OpenDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Manager
+		dataType: string
+		lineageTag: dd6c19e7-6dbc-4562-a641-b38922b5ee8d
+		summarizeBy: none
+		sourceColumn: Manager
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Branch Geography'
+		lineageTag: cc9ddf61-5568-423d-b3ac-63de9fea05f6
+
+		level Region
+			lineageTag: 125b3cfa-6236-4f79-aad5-7b26f89f4598
+			column: Region
+
+		level City
+			lineageTag: b27e2bcb-3df6-46ab-8105-4406ca80ca91
+			column: City
+
+		level Branch
+			lineageTag: f6cc22f7-9924-433f-9a11-e94ddc2dbf5e
+			column: 'Branch Name'
+
+	partition Branch = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\Dimensions\BankDIAD_Dimensions.xlsx"), null, true),
+				    Sheet = Source{[Item="DimBranch", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Trimmed = Table.TransformColumns(Promoted, {{"City", Text.Trim, type text}, {"District", Text.Trim, type text}}),
+				    Typed = Table.TransformColumnTypes(Trimmed, {
+				        {"BranchID", type text},
+				        {"BranchName", type text},
+				        {"City", type text},
+				        {"District", type text},
+				        {"Region", type text},
+				        {"BranchType", type text},
+				        {"OpenDate", type date},
+				        {"Manager", type text}
+				    })
+				in
+				    Typed
+

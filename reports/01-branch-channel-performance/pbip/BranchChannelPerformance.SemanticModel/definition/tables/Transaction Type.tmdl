@@ -1,0 +1,45 @@
+table 'Transaction Type'
+	lineageTag: e6b57648-de99-4313-9125-7cbdcaf0bb5e
+
+	column 'Transaction Type ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: c7824ccf-6386-4262-a059-429949eea8f9
+		summarizeBy: none
+		sourceColumn: TransactionTypeID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transaction Type Name'
+		dataType: string
+		lineageTag: 60f64e39-0773-4bdf-bbea-c5890ea15d5d
+		summarizeBy: none
+		sourceColumn: TransactionTypeName
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transaction Category'
+		dataType: string
+		lineageTag: cdb497f6-69a9-48f0-9324-a3356aa8ff6c
+		summarizeBy: none
+		sourceColumn: TransactionCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Transaction Type' = m
+		mode: import
+		source =
+				let
+				    Source = Table.Distinct(Table.SelectColumns(Transactions, {"TransactionTypeID", "TransactionTypeName"})),
+				    Sorted = Table.Sort(Source, {{"TransactionTypeID", Order.Ascending}}),
+				    WithCat = Table.AddColumn(Sorted, "TransactionCategory", each
+				        if [TransactionTypeName] = "Gửi tiền mặt" or [TransactionTypeName] = "Rút tiền mặt" then "Cash"
+				        else if Text.StartsWith([TransactionTypeName], "Chuyển khoản") then "Transfer"
+				        else if [TransactionTypeName] = "Thanh toán hóa đơn" or [TransactionTypeName] = "Mua sắm thẻ" then "Payment"
+				        else if [TransactionTypeName] = "Nhận lương" then "Income"
+				        else if [TransactionTypeName] = "Trả nợ vay" then "Loan Repayment"
+				        else "Other", type text)
+				in
+				    WithCat
+

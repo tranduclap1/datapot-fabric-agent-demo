@@ -1,0 +1,128 @@
+table 'Key Measures'
+	lineageTag: 4106266d-34c1-4ba0-be7a-51d5dc925031
+
+	measure 'Total Transactions' = COUNTROWS ( Transactions )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: dd46b3ed-ca56-49f4-8331-d5d783fa34fa
+
+	measure 'Active Customers' = DISTINCTCOUNT ( Transactions[Customer ID] )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: dce6f935-22a9-494c-aa04-f47c637a09a1
+
+	measure 'Total Inflow' = CALCULATE ( SUM ( Transactions[Amount (VND)] ), Transactions[Direction] = "Credit" )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 5ff8487a-719b-4525-8b2b-7a51ea8e4fd0
+
+	measure 'Total Outflow' = CALCULATE ( -1 * SUM ( Transactions[Amount (VND)] ), Transactions[Direction] = "Debit" )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 11fcb5d2-e858-4c92-b495-a7380d0712b6
+
+	measure 'Net Flow' = [Total Inflow] - [Total Outflow]
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 279af64e-d930-44ac-b228-c4929f06304d
+
+	measure 'Gross Transaction Value' = [Total Inflow] + [Total Outflow]
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: f721cfd5-89a2-45bc-9103-b5f578515074
+
+	measure 'Avg Transaction Size' = DIVIDE ( [Gross Transaction Value], [Total Transactions] )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 03d9ce69-e573-4289-8af0-a14727a6cf44
+
+	measure 'Fee Revenue' = SUM ( Transactions[Fee (VND)] )
+		formatString: #,##0
+		displayFolder: 02 Revenue & Targets
+		lineageTag: 263c9d95-ae54-42ad-a44a-2cab0fce574e
+
+	measure 'Revenue Target' = CALCULATE ( SUM ( 'Branch Targets'[Target Value] ), 'Branch Targets'[Target Type] = "Total Revenue (VND)" )
+		formatString: #,##0
+		displayFolder: 02 Revenue & Targets
+		lineageTag: 735f8eba-13a5-42c4-a569-1d8ab312e2cf
+
+	measure 'CASA Balance Target' = CALCULATE ( SUM ( 'Branch Targets'[Target Value] ), 'Branch Targets'[Target Type] = "CASA Balance (VND)" )
+		formatString: #,##0
+		displayFolder: 02 Revenue & Targets
+		lineageTag: 21011ba9-fc04-434a-b8d1-e801864da660
+
+	measure 'Avg Service Time (min)' = AVERAGE ( Transactions[Service Time (min)] )
+		formatString: #,##0.0
+		displayFolder: 03 Service & Quality
+		lineageTag: 3b3a7fe7-17ad-4b5f-aa46-2cce50ea3589
+
+	measure 'Survey Responses' = COUNTROWS ( 'NPS Surveys' )
+		formatString: #,##0
+		displayFolder: 03 Service & Quality
+		lineageTag: af1cecbd-3952-40c2-bab5-a83f72c76e51
+
+	measure Promoters = CALCULATE ( COUNTROWS ( 'NPS Surveys' ), 'NPS Surveys'[NPS Category] = "Promoter" )
+		formatString: #,##0
+		isHidden
+		displayFolder: 03 Service & Quality
+		lineageTag: cea8c59d-93f4-4cee-bbea-7f5c67a29a0c
+
+	measure Detractors = CALCULATE ( COUNTROWS ( 'NPS Surveys' ), 'NPS Surveys'[NPS Category] = "Detractor" )
+		formatString: #,##0
+		isHidden
+		displayFolder: 03 Service & Quality
+		lineageTag: d3b90c7e-19c8-4677-9253-bd4162fc7fdc
+
+	measure NPS = DIVIDE ( [Promoters] - [Detractors], [Survey Responses] ) * 100
+		formatString: #,##0
+		displayFolder: 03 Service & Quality
+		lineageTag: 4a396ef0-b20d-4201-b054-f9ed8071ef25
+
+	measure 'Avg NPS Score' = AVERAGE ( 'NPS Surveys'[Score] )
+		formatString: 0.00
+		displayFolder: 03 Service & Quality
+		lineageTag: e5369e44-58b5-46d0-81a5-88ca8bd30217
+
+	measure 'Digital Transactions' = CALCULATE ( [Total Transactions], Channel[Is Digital] = TRUE )
+		formatString: #,##0
+		displayFolder: 04 Digital
+		lineageTag: d385f075-17fe-4c8f-9262-6c6fe79723bb
+
+	measure 'Digital Adoption %' = DIVIDE ( [Digital Transactions], [Total Transactions] )
+		formatString: 0.0%
+		displayFolder: 04 Digital
+		lineageTag: 2ab577a1-d094-4b05-9418-c0cbb9876679
+
+	measure 'Transactions PM' = CALCULATE ( [Total Transactions], DATEADD ( 'Date'[Date], -1, MONTH ) )
+		formatString: #,##0
+		displayFolder: 05 Time Intelligence
+		lineageTag: 190e26a1-8f44-4e00-95c8-32c21acf79fd
+
+	measure 'Transactions MoM %' = DIVIDE ( [Total Transactions] - [Transactions PM], [Transactions PM] )
+		formatString: 0.0%
+		displayFolder: 05 Time Intelligence
+		lineageTag: 5c5bad34-8528-4433-ac4a-9267da00033b
+
+	measure 'Transactions YTD' = TOTALYTD ( [Total Transactions], 'Date'[Date] )
+		formatString: #,##0
+		displayFolder: 05 Time Intelligence
+		lineageTag: fde3fd0a-9430-43cd-96f0-6ebb854658e6
+
+	measure 'Fee Revenue YTD' = TOTALYTD ( [Fee Revenue], 'Date'[Date] )
+		formatString: #,##0
+		displayFolder: 05 Time Intelligence
+		lineageTag: 6f6ddfc4-2464-4142-b59c-e0e47ab4b121
+
+	column Value
+		isHidden
+		lineageTag: 00330bf2-2bad-4a4b-a985-0979710fed7a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Key Measures' = calculated
+		mode: import
+		source = {BLANK()}
+

@@ -1,0 +1,63 @@
+table Product
+	lineageTag: a094b2bd-ae10-41dd-99e5-039b6bab5b96
+
+	column 'Product ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: f27a6a9b-7b33-45c1-9c45-4b9ff7110e9a
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: 437c5c37-fb56-4eaa-a710-19e758890927
+		summarizeBy: none
+		sourceColumn: ProductName
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Category'
+		dataType: string
+		lineageTag: 3e49471f-fb89-4da1-a7a8-d15b957b41b0
+		summarizeBy: none
+		sourceColumn: ProductCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Sub Category'
+		dataType: string
+		lineageTag: e204b15f-474c-4b9d-830a-3d927d8d8a4b
+		summarizeBy: none
+		sourceColumn: ProductSubCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Base Rate'
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 9cd7e3bc-03f7-432c-8a7a-ab2192d2d561
+		summarizeBy: none
+		sourceColumn: BaseRate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\Dimensions\BankDIAD_Dimensions.xlsx"), null, true),
+				    Sheet = Source{[Item="DimProduct", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"ProductID", type text},
+				        {"ProductName", type text},
+				        {"ProductCategory", type text},
+				        {"ProductSubCategory", type text},
+				        {"BaseRate", type number}
+				    })
+				in
+				    Typed
+

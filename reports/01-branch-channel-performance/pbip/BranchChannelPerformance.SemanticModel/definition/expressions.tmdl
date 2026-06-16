@@ -1,0 +1,5 @@
+expression DataFolder = "c:\Users\HoàngTôMạnh\src\datapot-fabric-agent-demo\reports\01-branch-channel-performance\dataset\raw" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 6ca0a15a-91b1-4066-bcdd-526771f6b17b
+
+	annotation PBI_ResultType = Text
+

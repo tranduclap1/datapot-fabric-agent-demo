@@ -1,0 +1,44 @@
+relationship Transactions_Date
+	fromColumn: Transactions.Date
+	toColumn: Date.Date
+
+relationship Transactions_Branch
+	fromColumn: Transactions.'Branch ID'
+	toColumn: Branch.'Branch ID'
+
+relationship Transactions_Channel
+	fromColumn: Transactions.'Channel ID'
+	toColumn: Channel.'Channel ID'
+
+relationship Transactions_TransactionType
+	fromColumn: Transactions.'Transaction Type ID'
+	toColumn: 'Transaction Type'.'Transaction Type ID'
+
+relationship Transactions_Product
+	fromColumn: Transactions.'Product ID'
+	toColumn: Product.'Product ID'
+
+relationship Transactions_Customer
+	fromColumn: Transactions.'Customer ID'
+	toColumn: Customer.'Customer ID'
+
+relationship NPSSurveys_Date
+	fromColumn: 'NPS Surveys'.'Survey Date'
+	toColumn: Date.Date
+
+relationship NPSSurveys_Branch
+	fromColumn: 'NPS Surveys'.'Branch ID'
+	toColumn: Branch.'Branch ID'
+
+relationship NPSSurveys_Customer
+	fromColumn: 'NPS Surveys'.'Customer ID'
+	toColumn: Customer.'Customer ID'
+
+relationship BranchTargets_Branch
+	fromColumn: 'Branch Targets'.'Branch ID'
+	toColumn: Branch.'Branch ID'
+
+relationship BranchTargets_Date
+	fromColumn: 'Branch Targets'.Month
+	toColumn: Date.Date
+

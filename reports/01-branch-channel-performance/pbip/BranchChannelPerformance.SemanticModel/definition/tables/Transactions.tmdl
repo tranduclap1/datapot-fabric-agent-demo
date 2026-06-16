@@ -1,0 +1,153 @@
+table Transactions
+	lineageTag: b5a9cfc8-7a35-457c-9192-604640c4415f
+
+	column 'Transaction ID'
+		dataType: string
+		isHidden
+		lineageTag: 52f0fbc1-7eaf-44fe-8e15-ce5c5ca95eaf
+		summarizeBy: none
+		sourceColumn: TransactionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: f097969d-3f3b-4134-9848-53d23e86c18f
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: 27366094-9dd9-4fd5-9962-c0d435fef9d8
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product ID'
+		dataType: string
+		isHidden
+		lineageTag: b4006a6a-d9b0-4986-a39d-12256707adf9
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Branch ID'
+		dataType: string
+		isHidden
+		lineageTag: 82df53df-4ae9-45fb-bff2-34fd932f69c1
+		summarizeBy: none
+		sourceColumn: BranchID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Channel ID'
+		dataType: string
+		isHidden
+		lineageTag: 5b53bad2-b056-45d5-8edb-69ccc5cded3e
+		summarizeBy: none
+		sourceColumn: ChannelID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Channel Name'
+		dataType: string
+		isHidden
+		lineageTag: e39df3e0-d5d8-48fb-9756-26a27eb956da
+		summarizeBy: none
+		sourceColumn: ChannelName
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transaction Type ID'
+		dataType: string
+		isHidden
+		lineageTag: 93d4cf07-e1da-43b4-82c2-c9b1e126f5eb
+		summarizeBy: none
+		sourceColumn: TransactionTypeID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transaction Type Name'
+		dataType: string
+		isHidden
+		lineageTag: 01caa40e-1b15-40c6-b148-93b79ba1d457
+		summarizeBy: none
+		sourceColumn: TransactionTypeName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Direction
+		dataType: string
+		lineageTag: 19dd72d1-72a6-4719-98a9-84db0baca24f
+		summarizeBy: none
+		sourceColumn: Direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Amount (VND)'
+		dataType: int64
+		isHidden
+		formatString: #,##0
+		lineageTag: affc5ed7-2251-47ce-b885-247b9dc67127
+		summarizeBy: sum
+		sourceColumn: Amount_VND
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fee (VND)'
+		dataType: int64
+		isHidden
+		formatString: #,##0
+		lineageTag: 038f9b24-444d-4229-bb71-0eb8de2c4825
+		summarizeBy: sum
+		sourceColumn: Fee_VND
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Service Time (min)'
+		dataType: double
+		isHidden
+		formatString: 0.0
+		lineageTag: 213ed70a-ceb8-420e-ba6b-6eb410415ab9
+		summarizeBy: average
+		sourceColumn: ServiceTimeMinutes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Transactions = m
+		mode: import
+		source =
+				let
+				    Source = Folder.Files(DataFolder & "\Transactions"),
+				    OnlyCsv = Table.SelectRows(Source, each [Extension] = ".csv"),
+				    AddData = Table.AddColumn(OnlyCsv, "Data", each Table.PromoteHeaders(Csv.Document([Content], [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]), [PromoteAllScalars = true])),
+				    Combined = Table.Combine(AddData[Data]),
+				    Typed = Table.TransformColumnTypes(Combined, {
+				        {"TransactionID", type text},
+				        {"Date", type date},
+				        {"CustomerID", type text},
+				        {"ProductID", type text},
+				        {"BranchID", type text},
+				        {"ChannelID", type text},
+				        {"ChannelName", type text},
+				        {"TransactionTypeID", type text},
+				        {"TransactionTypeName", type text},
+				        {"Direction", type text},
+				        {"Amount_VND", Int64.Type},
+				        {"Fee_VND", Int64.Type},
+				        {"ServiceTimeMinutes", type number}
+				    })
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+
