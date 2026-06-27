@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "7320398e2e564c50b9ff",
+  "position": {
+    "x": 972,
+    "y": 112,
+    "z": 6000,
+    "height": 128,
+    "width": 284,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Campaign"
+                    }
+                  },
+                  "Property": "Traffic Channel"
+                }
+              },
+              "queryRef": "Campaign.Traffic Channel",
+              "nativeQueryRef": "Traffic Channel",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

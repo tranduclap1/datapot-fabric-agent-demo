@@ -1,0 +1,116 @@
+table 'Key Measures'
+	lineageTag: b3fab50c-b89b-481f-99b7-d2dbee837bea
+
+	measure 'Units Sold' = SUM ( Sales[Units] )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 2f7826e3-8ef0-445f-a4b7-5183b9d98a0e
+
+	measure 'Distinct Customers' = DISTINCTCOUNT ( Sales[Customer ID] )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 20d2cebe-e7e5-4d34-b50b-a8312660a614
+
+	measure 'Distinct Products Sold' = DISTINCTCOUNT ( Sales[Product ID] )
+		formatString: #,##0
+		displayFolder: 01 Volume
+		lineageTag: 0967fe22-8540-4fcc-a762-976595bf27c5
+
+	measure Revenue = SUMX ( Sales, Sales[Units] * RELATED ( Product[Unit Price] ) )
+		formatString: \$#,##0
+		displayFolder: 02 Revenue & Profit
+		lineageTag: 483aa502-dcea-48b0-a4d7-9a02f8f8db2c
+
+	measure Cost = SUMX ( Sales, Sales[Units] * RELATED ( Product[Unit Cost] ) )
+		formatString: \$#,##0
+		displayFolder: 02 Revenue & Profit
+		lineageTag: ff73660a-70c2-4cde-8353-02119ce8f8f1
+
+	measure 'Gross Margin' = [Revenue] - [Cost]
+		formatString: \$#,##0
+		displayFolder: 02 Revenue & Profit
+		lineageTag: fa2c0808-c798-4263-bd35-e243c7224421
+
+	measure 'Gross Margin %' = DIVIDE ( [Gross Margin], [Revenue] )
+		formatString: 0.0%
+		displayFolder: 02 Revenue & Profit
+		lineageTag: 09d8ddc3-3ed5-479c-843a-63d5e11693e5
+
+	measure 'Average Selling Price' = DIVIDE ( [Revenue], [Units Sold] )
+		formatString: \$#,##0.00
+		displayFolder: 02 Revenue & Profit
+		lineageTag: ca92ae45-5987-4fae-9379-002198a544fb
+
+	measure 'Revenue per Customer' = DIVIDE ( [Revenue], [Distinct Customers] )
+		formatString: \$#,##0
+		displayFolder: 02 Revenue & Profit
+		lineageTag: a8955170-345e-49c9-8bee-c33161d65389
+
+	measure Budget = CALCULATE ( SUM ( Budget[Amount] ), Budget[Type] = "Budget" )
+		formatString: \$#,##0
+		displayFolder: 03 Budget & Forecast
+		lineageTag: 20ae1915-272b-4586-b844-49527523b2e4
+
+	measure Forecast = CALCULATE ( SUM ( Budget[Amount] ), Budget[Type] = "Forecast" )
+		formatString: \$#,##0
+		displayFolder: 03 Budget & Forecast
+		lineageTag: c0a2ec46-773b-4275-8d57-e24993b09563
+
+	measure 'Revenue vs Budget' = [Revenue] - [Budget]
+		formatString: \$#,##0
+		displayFolder: 03 Budget & Forecast
+		lineageTag: 74a76b1d-5964-417a-b9e6-321e35ad89ca
+
+	measure 'Revenue vs Budget %' = DIVIDE ( [Revenue] - [Budget], [Budget] )
+		formatString: 0.0%
+		displayFolder: 03 Budget & Forecast
+		lineageTag: 48b9c2ee-af83-42c7-8c3a-d1801bc7e181
+
+	measure 'Budget Attainment %' = DIVIDE ( [Revenue], [Budget] )
+		formatString: 0.0%
+		displayFolder: 03 Budget & Forecast
+		lineageTag: 94728e71-907d-473e-9558-f51192a1e810
+
+	measure 'Revenue PY' = CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: \$#,##0
+		displayFolder: 04 Time Intelligence
+		lineageTag: a60c0ddf-24b9-44af-90b9-1330246fbbc1
+
+	measure 'Revenue YoY' = [Revenue] - [Revenue PY]
+		formatString: \$#,##0
+		displayFolder: 04 Time Intelligence
+		lineageTag: 311cff56-08f1-46a1-bef4-5bb98c19fffc
+
+	measure 'Revenue YoY %' = DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )
+		formatString: 0.0%
+		displayFolder: 04 Time Intelligence
+		lineageTag: 19440604-627c-4061-9c23-26fb47b525b1
+
+	measure 'Revenue YTD' = TOTALYTD ( [Revenue], 'Date'[Date] )
+		formatString: \$#,##0
+		displayFolder: 04 Time Intelligence
+		lineageTag: 770321f5-f370-47a9-9541-d5d9621967a7
+
+	measure 'Digital Revenue' = CALCULATE ( [Revenue], Campaign[Device] IN { "Desktop", "Mobile", "Tablet" } )
+		formatString: \$#,##0
+		displayFolder: 05 Marketing & Channel
+		lineageTag: e0b71527-d565-47b5-84f6-c4ddec1ccfc0
+
+	measure 'Digital Revenue %' = DIVIDE ( [Digital Revenue], [Revenue] )
+		formatString: 0.0%
+		displayFolder: 05 Marketing & Channel
+		lineageTag: 8f069936-41c8-418d-aee2-9a18e4fc966d
+
+	column Value
+		isHidden
+		lineageTag: a9ebdd9e-eb0e-41db-b665-57424d6bf067
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Key Measures' = calculated
+		mode: import
+		source = {BLANK()}
+

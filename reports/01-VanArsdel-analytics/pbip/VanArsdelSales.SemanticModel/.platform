@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "VanArsdel Sales Analytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e117bab5-945e-43fe-a993-ed2a0fafa93e"
+  }
+}

@@ -1,0 +1,32 @@
+relationship Sales_Date
+	fromColumn: Sales.Date
+	toColumn: Date.Date
+
+relationship Sales_Product
+	fromColumn: Sales.'Product ID'
+	toColumn: Product.'Product ID'
+
+relationship Sales_Customer
+	fromColumn: Sales.'Customer ID'
+	toColumn: Customer.'Customer ID'
+
+relationship Sales_Campaign
+	fromColumn: Sales.'Campaign ID'
+	toColumn: Campaign.'Campaign ID'
+
+relationship Customer_Geo
+	fromColumn: Customer.ZIP
+	toColumn: Geo.ZIP
+
+relationship Budget_Date
+	fromColumn: Budget.Date
+	toColumn: Date.Date
+
+relationship Product_ProductGroup
+	fromColumn: Product.Category-Segment
+	toColumn: 'Product Group'.Category-Segment
+
+relationship Budget_ProductGroup
+	fromColumn: Budget.Category-Segment
+	toColumn: 'Product Group'.Category-Segment
+

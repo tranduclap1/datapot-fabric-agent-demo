@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "789789136fd44ec2a1b6",
+  "position": {
+    "x": 738,
+    "y": 112,
+    "z": 4000,
+    "height": 128,
+    "width": 226,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Key Measures"
+                    }
+                  },
+                  "Property": "Revenue vs Budget"
+                }
+              },
+              "queryRef": "Key Measures.Revenue vs Budget",
+              "nativeQueryRef": "Revenue vs Budget"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

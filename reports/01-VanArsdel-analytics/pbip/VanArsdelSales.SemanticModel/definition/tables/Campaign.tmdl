@@ -1,0 +1,59 @@
+table Campaign
+	lineageTag: bd858d6e-da41-428f-8465-0b9a2a85e4dc
+
+	column 'Campaign ID'
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 0976485d-2ea2-403c-a099-56a62bda7390
+		summarizeBy: none
+		sourceColumn: CampaignID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Traffic Channel'
+		dataType: string
+		lineageTag: 0548598c-1bb1-409e-9baa-4ecd121dbb7b
+		summarizeBy: none
+		sourceColumn: TrafficChannel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Device
+		dataType: string
+		lineageTag: 6a6fd18e-2538-44f9-bdcd-66f9b570df25
+		summarizeBy: none
+		sourceColumn: Device
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Channel Type'
+		dataType: string
+		lineageTag: 6e83fbe3-0910-43aa-8462-8e70ba5c5720
+		summarizeBy: none
+		sourceColumn: Channel Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Campaign = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\VanArsdel_Actuals.xlsx"), null, true),
+				    Sheet = Source{[Item="Campaign", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"CampaignID", Int64.Type},
+				        {"TrafficChannel", type text},
+				        {"Device", type text}
+				    }),
+				    Trimmed = Table.TransformColumns(Typed, {{"TrafficChannel", Text.Trim, type text}, {"Device", Text.Trim, type text}}),
+				    FixChannel = Table.ReplaceValue(Trimmed, "Affliliate", "Affiliate", Replacer.ReplaceValue, {"TrafficChannel"}),
+				    FixDevice = Table.ReplaceValue(FixChannel, "Deskop", "Desktop", Replacer.ReplaceValue, {"Device"}),
+				    AddType = Table.AddColumn(FixDevice, "Channel Type", each if List.Contains({"Desktop", "Mobile", "Tablet"}, [Device]) then "Digital" else "Offline", type text)
+				in
+				    AddType
+
+	annotation PBI_ResultType = Table
+

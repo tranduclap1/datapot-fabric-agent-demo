@@ -4,7 +4,7 @@ Every report in this repo, newest decisions on top. One folder per report under 
 
 | # | Report | Domain | Status | Model | Owner | Notes |
 |---|--------|--------|--------|-------|-------|-------|
-| 01 | [Branch & Channel Performance](01-branch-channel-performance/README.md) | Banking — branch & channel ops | 🟢 Built | Import (TMDL) over BankDIAD CSVs/XLSX | — | All 3 pages built (Overview, Channel Performance, Branch Scorecard); opens in Desktop |
+| 01 | [VanArsdel Sales Analytics](01-VanArsdel-analytics/README.md) | Manufacturing & Retail — sales | 🟢 Built | Import (TMDL) over VanArsdel Actuals + Budget/Forecast XLSX | — | Part 1 + Part 2 docs done; PBIP opens & refreshes in Desktop — model (2 facts, 6 dims, 20 measures) + 5-page/43-visual report, Datapot theme; P5 page-filtered to the Jan–Jun 2020 overlap |
 
 Legend: 🔴 scoping · 🟡 in progress · 🟢 published.
 

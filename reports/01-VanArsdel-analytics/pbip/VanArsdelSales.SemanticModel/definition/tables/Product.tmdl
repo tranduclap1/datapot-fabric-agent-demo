@@ -1,0 +1,107 @@
+table Product
+	lineageTag: 62a5c18a-e7ce-48b6-994d-2de0d7a40b35
+
+	column 'Product ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: aba548e2-9175-491e-be84-b34c430b810e
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 12b281f4-7e04-4719-a9a6-1cb09df72a17
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manufacturer
+		dataType: string
+		isHidden
+		lineageTag: 5e03fd69-59b3-41e8-aef7-3317d817b3ba
+		summarizeBy: none
+		sourceColumn: Manufacturer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category-Segment
+		dataType: string
+		isHidden
+		lineageTag: e9f83627-dcf0-4f30-a476-469d6901f6e5
+		summarizeBy: none
+		sourceColumn: Category-Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		isHidden
+		lineageTag: 96d71d7f-af56-478d-a035-63380ca70680
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		isHidden
+		lineageTag: be014e7e-1b1d-415c-986f-352c8d8b11a8
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Cost'
+		dataType: double
+		isHidden
+		formatString: \$#,##0.00
+		lineageTag: 2bf3c27e-154b-4715-9ef3-4947a53ed7be
+		summarizeBy: none
+		sourceColumn: Unit Cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Price'
+		dataType: double
+		isHidden
+		formatString: \$#,##0.00
+		lineageTag: 18b6f263-75d7-4207-b98e-46a4adf1bd50
+		summarizeBy: none
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column ManufacturerID
+		dataType: string
+		lineageTag: 8635a78d-40cf-409d-9885-c37aff86c43b
+		summarizeBy: none
+		sourceColumn: ManufacturerID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\VanArsdel_Actuals.xlsx"), null, true),
+				    Sheet = Source{[Item="Product", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"ProductID", type text},
+				        {"Product", type text},
+				        {"Category", type text},
+				        {"Segment", type text},
+				        {"Manufacturer", type text},
+				        {"Unit Cost", type number},
+				        {"Unit Price", type number}
+				    }),
+				    AddKey = Table.AddColumn(Typed, "Category-Segment", each [Category] & "-" & [Segment], type text)
+				in
+				    AddKey
+
+	annotation PBI_ResultType = Table
+

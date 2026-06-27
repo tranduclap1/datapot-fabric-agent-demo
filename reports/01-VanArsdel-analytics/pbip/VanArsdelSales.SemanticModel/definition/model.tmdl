@@ -1,0 +1,25 @@
+model VanArsdelSales
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["DataFolder","Date","Product","Customer","Geo","Campaign","Sales","Budget"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Date
+ref table Product
+ref table Customer
+ref table Geo
+ref table Campaign
+ref table Sales
+ref table Budget
+ref table 'Product Group'
+ref table 'Key Measures'
+

@@ -1,0 +1,71 @@
+table Sales
+	lineageTag: 758d4c94-170b-4fc0-b36b-c877658074ae
+
+	column 'Product ID'
+		dataType: string
+		isHidden
+		lineageTag: 8313420b-4d69-42ca-b3ae-8a4545cd842b
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 29ea9fe0-1902-4bf1-a4f8-05f5eea7cfd8
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		lineageTag: 14de6c48-6b8f-41ae-b717-d61b6a09c5f1
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Campaign ID'
+		dataType: int64
+		isHidden
+		lineageTag: 525c62ba-4d99-4189-840a-38d640f0ba80
+		summarizeBy: none
+		sourceColumn: CampaignID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Units
+		dataType: int64
+		isHidden
+		formatString: #,##0
+		lineageTag: c347d9fb-1ffc-4b3b-8ba3-f4ec3ef73381
+		summarizeBy: sum
+		sourceColumn: Units
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\VanArsdel_Actuals.xlsx"), null, true),
+				    Sheet = Source{[Item="Sales", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"ProductID", type text},
+				        {"Date", type date},
+				        {"CustomerID", type text},
+				        {"CampaignID", Int64.Type},
+				        {"Units", Int64.Type}
+				    })
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

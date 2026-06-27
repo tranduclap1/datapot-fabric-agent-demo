@@ -3,476 +3,360 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Build recap — Branch &amp; Channel Performance · Datapot Fabric agent demo</title>
-<meta name="description" content="How an AI coding agent built a Power BI / Microsoft Fabric report as reviewable PBIP code — the process, the debug log, the cost, and the prompts. By Datapot Analytics.">
+<title>Build recap — VanArsdel Sales Analytics · Datapot Fabric agent demo</title>
+<meta name="description" content="How an AI coding agent took the VanArsdel sample from two raw Excel files to a documented, themed, validated Power BI report — the process, the cost, the prompts, and the lessons. By Datapot Analytics.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ===== Datapot Design System tokens (applied; the DS bundle itself is not vendored) ===== */
   :root{
-    --blue-50:oklch(96.2% 0.0142 238); --blue-100:oklch(91.3% 0.0328 238.2); --blue-200:oklch(82.7% 0.0663 235.5);
-    --blue-400:oklch(65.7% 0.1334 238.6); --blue-500:oklch(59.1% 0.142 244.1); --blue-600:oklch(52.9% 0.1404 248.4);
-    --blue-700:oklch(44.3% 0.1226 250.8); --blue-900:oklch(31.5% 0.081 258.1); --blue-950:oklch(24.2% 0.0631 258.5);
-    --ms-blue:oklch(56.8% 0.1665 251.3); --ms-blue-hover:oklch(53.2% 0.1482 251.1);
-    --teal-500:oklch(70.9% 0.1014 177); --teal-700:oklch(55.7% 0.0854 177.3);
-    --amber-500:oklch(78.9% 0.1478 72.1); --amber-700:oklch(65.5% 0.1349 68.9);
-    --sky-500:oklch(65.7% 0.1331 238.8);
-    --grad-brand:linear-gradient(135deg, oklch(24.2% 0.0631 258.5) 0%, oklch(44.3% 0.1226 250.8) 45%, oklch(65.7% 0.1334 238.6) 100%);
-    --gray-0:oklch(100% 0 0); --gray-25:oklch(98.8% 0.0017 247.8); --gray-50:oklch(97.5% 0.0045 258.3);
-    --gray-100:oklch(95.1% 0.0063 255.5); --gray-200:oklch(92.1% 0.0092 258.3); --gray-300:oklch(84.9% 0.0129 255.5);
-    --gray-400:oklch(74.8% 0.017 253.9); --gray-500:oklch(61.6% 0.0248 254.5); --gray-600:oklch(50.2% 0.0261 254.5);
-    --gray-700:oklch(39.8% 0.0235 255.7); --gray-900:oklch(22% 0.0157 256.8);
-    --success-50:oklch(95.9% 0.0214 158.6); --success-500:oklch(63.5% 0.1464 155.6); --success-700:oklch(51.2% 0.1182 155.4);
-    --warning-50:oklch(97% 0.0288 82.6); --warning-700:oklch(61.5% 0.1302 69.3);
-    --danger-50:oklch(95.7% 0.0185 17.5); --danger-500:oklch(58.2% 0.1948 25.1); --danger-700:oklch(46.1% 0.162 26);
-    --fg:var(--gray-900); --fg-muted:var(--gray-600); --fg-subtle:var(--gray-500); --fg-brand:var(--blue-700); --fg-link:var(--ms-blue);
-    --bg:var(--gray-0); --bg-subtle:var(--gray-50); --surface:var(--gray-0); --surface-tint:var(--blue-50);
-    --border:var(--gray-200); --border-strong:var(--gray-300);
-    --font-display:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;
-    --font-sans:"Public Sans","Segoe UI",system-ui,sans-serif;
-    --font-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
-    --shadow-2:0 1px 2px oklch(24.4% 0.0614 261.8 / .06),0 1px 1px oklch(24.4% 0.0614 261.8 / .04);
-    --shadow-4:0 2px 4px oklch(24.4% 0.0614 261.8 / .06),0 1px 2px oklch(24.4% 0.0614 261.8 / .04);
-    --shadow-8:0 4px 8px oklch(24.4% 0.0614 261.8 / .08),0 1px 2px oklch(24.4% 0.0614 261.8 / .04);
-    --shadow-16:0 8px 16px oklch(24.4% 0.0614 261.8 / .1),0 2px 4px oklch(24.4% 0.0614 261.8 / .06);
-    --shadow-brand:0 12px 32px -8px oklch(52.9% 0.1404 248.4 / .35);
-    --shadow-inner:inset 0 1px 0 oklch(100% 0 0 / .18);
-    --radius-sm:6px; --radius-lg:12px; --radius-xl:16px; --radius-2xl:24px; --radius-pill:999px;
-    --ease-out:cubic-bezier(0.33,0,0.1,1); --dur-base:200ms;
-    --maxw:1080px;
+    --ink:#1F2933; --ink-2:#3E4C59; --muted:#647382; --faint:#8A97A5;
+    --line:#E4E7EB; --line-2:#EEF1F4; --bg:#FFFFFF; --bg-cool:#F6F8FB; --bg-panel:#F9FBFD;
+    --blue:#1F6FEB; --navy:#0A3D91; --navy-deep:#072C68;
+    --good:#0E9F6E; --warn:#B7791F; --bad:#D7263D; --teal:#11A8CD;
+    --mono:"JetBrains Mono",ui-monospace,"Cascadia Code","Consolas",Menlo,monospace;
+    --sans:"Public Sans",system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --semi:"Plus Jakarta Sans","Public Sans",system-ui,"Segoe UI",sans-serif;
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  h1,h2,h3,h4{font-family:var(--font-display);color:var(--fg);margin:0;letter-spacing:-0.02em}
-  h2{font-weight:700;font-size:clamp(1.75rem,3vw,2.5rem);line-height:1.25;letter-spacing:-0.01em}
-  h3{font-weight:600;font-size:1.25rem;line-height:1.25}
-  p{margin:0 0 14px}
-  a{color:var(--fg-link);text-decoration:none}
-  a:hover{text-decoration:underline;text-underline-offset:3px}
-  .eyebrow{font-family:var(--font-sans);font-weight:600;font-size:0.8125rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-brand);margin:0 0 12px}
-  .muted{color:var(--fg-muted)} .mono{font-family:var(--font-mono)}
-  .hl{background:linear-gradient(180deg,transparent 56%,oklch(85.9% 0.1115 78.9 / .7) 56%);border-radius:2px;font-weight:600;color:inherit}
-  .hero .hl{background:oklch(100% 0 0 / .16);border-radius:5px;padding:0 .28em;font-weight:700;color:#fff}
-  [data-lucide]{width:18px;height:18px;stroke-width:1.75;vertical-align:-3px}
-  [data-lucide]:empty{display:none}  /* hide placeholders if the Lucide CDN hasn't rendered yet (e.g. offline) */
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  h1,h2,h3,h4{font-family:var(--semi)}
+  h2{font-weight:700;font-size:1.6rem;letter-spacing:-.01em;margin:0 0 .2em;color:var(--ink);text-wrap:balance}
+  h3{font-weight:700;font-size:1.06rem;margin:0 0 .35em;color:var(--ink)}
+  p{margin:.5em 0}
+  .eyebrow{font-family:var(--semi);font-size:.72rem;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--blue)}
 
-  /* ===== header ===== */
-  header.site{position:sticky;top:0;z-index:30;border-bottom:1px solid transparent;transition:background var(--dur-base),border-color var(--dur-base),box-shadow var(--dur-base)}
-  header.site.scrolled{background:oklch(100% 0 0 / .8);backdrop-filter:blur(20px) saturate(180%);border-color:var(--border);box-shadow:var(--shadow-2)}
-  header.site .row{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;color:var(--fg);font-size:0.95rem}
-  .brand:hover{text-decoration:none}
-  .brand .sub{color:var(--fg-muted);font-weight:500}
-  .brand .logo{height:26px;width:auto;display:block}
-  .hnav{display:flex;align-items:center;gap:22px}
-  .hnav a:not(.btn){color:var(--fg-muted);font-size:0.875rem;font-weight:500}
-  .hnav a:not(.btn):hover{color:var(--fg);text-decoration:none}
-  @media(max-width:760px){.hnav .lnk{display:none}}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-sans);font-weight:600;font-size:0.875rem;
-    padding:9px 16px;border-radius:var(--radius-sm);border:1px solid transparent;cursor:pointer;transition:background var(--dur-base),box-shadow var(--dur-base)}
-  .btn-primary{background:var(--blue-600);color:#fff}
-  .btn-primary:hover{background:var(--blue-700);text-decoration:none}
-  .btn-ghost{background:transparent;border-color:var(--border-strong);color:var(--fg)}
-  .btn-ghost:hover{background:var(--bg-subtle);text-decoration:none}
-  .btn-onbrand{background:#fff;color:var(--blue-700)} .btn-onbrand:hover{background:var(--blue-50);text-decoration:none}
-  .btn-onbrand-ghost{background:transparent;border-color:oklch(100% 0 0 / .5);color:#fff} .btn-onbrand-ghost:hover{background:oklch(100% 0 0 / .12);text-decoration:none}
+  /* hero */
+  .hero{background:var(--navy-deep);color:#EAF1FF;
+    background-image:radial-gradient(900px 320px at 86% -10%, rgba(31,111,235,.55), transparent 60%);
+    border-bottom:3px solid var(--blue)}
+  .hero .wrap{padding-top:46px;padding-bottom:40px}
+  .hero .eyebrow{color:#8FB6FF}
+  .hero h1{font-weight:800;font-size:2.6rem;line-height:1.08;letter-spacing:-.02em;
+    margin:.28em 0 .15em;color:#fff;text-wrap:balance}
+  .hero .lede{font-size:1.12rem;color:#C5D6F5;max-width:64ch;margin:.4em 0 0}
+  .brandrow{display:flex;align-items:center;gap:10px;font-family:var(--semi);
+    font-weight:700;letter-spacing:.02em;color:#EAF1FF}
+  .dot{width:12px;height:12px;border-radius:3px;background:var(--blue);
+    box-shadow:0 0 0 4px rgba(31,111,235,.25)}
+  .statband{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.14);border-radius:12px;overflow:hidden;margin-top:30px}
+  .stat{background:var(--navy-deep);padding:16px 16px 14px}
+  .stat .n{font-family:var(--semi);font-weight:700;font-size:1.5rem;color:#fff;
+    font-variant-numeric:tabular-nums;line-height:1.1}
+  .stat .l{font-size:.74rem;color:#9FB8E6;margin-top:3px;letter-spacing:.02em}
+  .stat .n .u{font-size:.86rem;color:#9FB8E6;font-weight:500}
 
-  /* ===== hero (the one brand-gradient moment) ===== */
-  .hero{background:var(--grad-brand);box-shadow:var(--shadow-inner);color:#fff;position:relative;overflow:hidden;border-radius:0 0 var(--radius-2xl) var(--radius-2xl)}
-  .hero .dots{position:absolute;inset:0;opacity:.08;background-image:radial-gradient(#fff 1.1px,transparent 1.2px);background-size:22px 22px;mask-image:linear-gradient(180deg,#000,transparent 80%)}
-  .hero .inner{position:relative;padding:64px 0 56px}
-  .hero .eyebrow{color:oklch(91.3% 0.0328 238.2)}
-  .hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(2.2rem,5.4vw,4rem);line-height:1.08;letter-spacing:-0.02em;color:#fff;max-width:17ch}
-  .hero .lead{font-size:clamp(1.05rem,2vw,1.25rem);line-height:1.5;color:oklch(91.3% 0.0328 238.2 / .95);max-width:60ch;margin-top:18px}
-  .hero .lead b{color:#fff;font-weight:600}
-  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}
-  .chip{font-family:var(--font-mono);font-size:0.75rem;color:oklch(91.3% 0.0328 238.2);border:1px solid oklch(100% 0 0 / .22);background:oklch(100% 0 0 / .08);padding:5px 11px;border-radius:var(--radius-pill)}
-  .chip b{color:#fff;font-weight:600}
-  .chip.ok{background:oklch(63.5% 0.1464 155.6);border-color:transparent;color:#05291c;font-weight:600}
-  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+  section{padding:44px 0;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:0}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .sec-no{font-family:var(--mono);font-size:.85rem;color:var(--blue);font-weight:600;
+    border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:var(--bg-cool)}
+  .intro{color:var(--ink-2);max-width:72ch}
 
-  /* ===== sections ===== */
-  section{padding:72px 0;border-top:1px solid var(--border)}
-  section.tint{background:var(--bg-subtle)}
-  .sec-head{max-width:62ch;margin-bottom:32px}
-  .sec-head h2{margin-top:6px}
-  .sec-head .sub{color:var(--fg-muted);font-size:1.05rem;margin-top:10px}
+  .ipo{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:6px}
+  .ipo .card{border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;background:var(--bg-panel)}
+  .ipo .tag{font-family:var(--semi);font-size:.72rem;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .ipo .tag b{width:8px;height:8px;border-radius:99px;display:inline-block}
+  .ipo ul{margin:0;padding-left:18px}
+  .ipo li{margin:.3em 0;font-size:.93rem;color:var(--ink-2)}
+  .ipo li b{color:var(--ink);font-weight:600}
 
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-4);padding:24px;transition:box-shadow var(--dur-base),transform var(--dur-base)}
-  .card.lift:hover{box-shadow:var(--shadow-8);transform:translateY(-2px)}
-  .card.feature{position:relative}
-  .card.feature::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;background:var(--grad-brand)}
+  .phases{margin-top:8px;border-left:2px solid var(--line);padding-left:0}
+  .phase{position:relative;padding:14px 0 14px 30px;border-bottom:1px dashed var(--line-2)}
+  .phase:last-child{border-bottom:0}
+  .phase::before{content:"";position:absolute;left:-7px;top:20px;width:12px;height:12px;border-radius:99px;
+    background:var(--blue);border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
+  .phase .pt{font-family:var(--semi);font-weight:700;color:var(--ink)}
+  .phase .pt .k{font-family:var(--mono);font-size:.78rem;color:var(--faint);margin-right:8px;font-weight:500}
+  .phase .pd{color:var(--ink-2);font-size:.94rem;margin-top:2px}
+  .phase .pd code{font-family:var(--mono);font-size:.85em;background:var(--bg-cool);
+    border:1px solid var(--line);border-radius:4px;padding:.5px 5px}
+  .pill{display:inline-block;font-size:.72rem;font-family:var(--semi);font-weight:600;
+    border-radius:99px;padding:1px 9px;margin-left:6px;vertical-align:middle}
+  .pill.flow{background:#EAF1FE;color:var(--blue)}
+  .pill.warnp{background:#FBF1DD;color:var(--warn)}
 
-  /* stat band */
-  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
-  .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-2);padding:18px 16px}
-  .stat .n{font-family:var(--font-display);font-weight:800;font-size:1.9rem;line-height:1;color:var(--blue-700)}
-  .stat .n small{font-size:1rem;color:var(--fg-subtle);font-weight:700}
-  .stat .k{font-size:0.75rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--fg-subtle);margin-top:8px}
-  @media(max-width:860px){.stats{grid-template-columns:repeat(3,1fr)}}
-  @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:540px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-2)}
+  thead th{background:var(--bg-cool);font-family:var(--semi);font-weight:700;color:var(--ink-2);
+    font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}
+  tbody tr:last-child td{border-bottom:0}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:.86rem}
+  tr.total td{background:var(--bg-cool);font-family:var(--semi);font-weight:700;color:var(--ink)}
+  .cost-note{font-size:.82rem;color:var(--muted);margin-top:10px}
 
-  /* io */
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-  .card h3 .ic{color:var(--blue-600)}
-  .card.out h3 .ic{color:var(--teal-700)}
-  .tick{list-style:none;margin:14px 0 0;padding:0}
-  .tick li{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--border);font-size:0.95rem}
-  .tick li:first-child{border-top:0}
-  .tick li [data-lucide]{flex:0 0 auto;color:var(--blue-600);margin-top:2px}
-  .out .tick li [data-lucide]{color:var(--teal-700)}
-  .tick b{font-weight:600}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:26px}
 
-  /* process */
-  .phase{display:grid;grid-template-columns:60px 1fr;gap:20px;padding:22px 0;border-top:1px solid var(--border)}
-  .phase:first-child{border-top:0}
-  .phase .idx{font-family:var(--font-display);font-weight:800;font-size:1.9rem;color:var(--blue-200);line-height:1}
-  .phase .role{font-size:0.75rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--amber-700);margin-bottom:6px}
-  .phase h3{margin-bottom:6px} .phase p{color:var(--fg-muted);margin:0}
+  .prompts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .pc{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .pc .h{display:flex;gap:10px;align-items:center;padding:11px 14px;background:var(--bg-cool);
+    border-bottom:1px solid var(--line)}
+  .pc .h .s{font-family:var(--mono);font-size:.74rem;color:#fff;background:var(--navy);
+    border-radius:6px;padding:2px 7px;font-weight:600}
+  .pc .h .t{font-family:var(--semi);font-weight:700;font-size:.9rem;color:var(--ink)}
+  .pc .b{padding:12px 14px;font-family:var(--mono);font-size:.84rem;line-height:1.5;color:var(--ink-2);
+    white-space:pre-wrap}
+  .pc .b .q{color:var(--faint)}
 
-  /* debug log */
-  .log{display:flex;flex-direction:column;gap:16px}
-  .log .card{padding:20px 22px}
-  .log .top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .log .top .t{font-weight:600;font-size:1.02rem}
-  .pill{display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:600;letter-spacing:.03em;padding:3px 10px;border-radius:var(--radius-pill);margin-left:auto;white-space:nowrap}
-  .pill.ok{background:var(--success-50);color:var(--success-700)}
-  .err{font-family:var(--font-mono);font-size:0.8rem;color:var(--danger-700);background:var(--danger-50);padding:9px 12px;border-radius:var(--radius-sm);margin-bottom:14px;white-space:pre-wrap;word-break:break-word}
-  .cf{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:620px){.cf{grid-template-columns:1fr}}
-  .cf .lab{font-size:0.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:5px}
-  .cf .h{font-weight:600;font-size:0.95rem;margin-bottom:3px}
-  .cf .fix .h{color:var(--success-700)}
-  .cf p{font-size:0.9rem;color:var(--fg-muted);margin:0}
+  .lessons{display:grid;grid-template-columns:1fr;gap:10px}
+  .lesson{border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;
+    padding:13px 16px;background:var(--bg-panel)}
+  .lesson.bad{border-left-color:var(--bad)}
+  .lesson.good{border-left-color:var(--good)}
+  .lesson h4{margin:0 0 3px;font-weight:700;font-size:.98rem;color:var(--ink)}
+  .lesson p{margin:0;font-size:.9rem;color:var(--ink-2)}
+  .imp{counter-reset:imp;list-style:none;margin:0;padding:0}
+  .imp li{position:relative;padding:11px 0 11px 40px;border-bottom:1px solid var(--line-2);color:var(--ink-2);font-size:.94rem}
+  .imp li:last-child{border-bottom:0}
+  .imp li::before{counter-increment:imp;content:counter(imp);position:absolute;left:0;top:10px;
+    width:26px;height:26px;border-radius:99px;background:var(--bg-cool);border:1px solid var(--line);
+    color:var(--blue);font-family:var(--mono);font-weight:600;font-size:.82rem;display:grid;place-items:center}
+  .imp li b{color:var(--ink);font-weight:600}
 
-  /* cost */
-  .cost{display:grid;grid-template-columns:1.05fr 1fr;gap:20px}
-  @media(max-width:760px){.cost{grid-template-columns:1fr}}
-  .estimate{font-family:var(--font-display);font-weight:800;font-size:clamp(2.2rem,5vw,3rem);line-height:1;color:var(--fg)}
-  .estimate .c{color:var(--amber-700)}
-  table.brk{width:100%;border-collapse:collapse;font-size:0.9rem;margin-top:4px}
-  table.brk td{padding:9px 6px;border-bottom:1px solid var(--border)}
-  table.brk td.r{text-align:right;font-family:var(--font-mono);color:var(--fg)}
-  table.brk tr:last-child td{border-bottom:0;font-weight:600}
-  .callout{display:flex;gap:12px;align-items:flex-start;background:var(--warning-50);border:1px solid oklch(85.9% 0.1115 78.9);border-radius:var(--radius-lg);padding:14px 16px;margin-top:18px}
-  .callout [data-lucide]{color:var(--warning-700);flex:0 0 auto;margin-top:2px}
-  .callout p{margin:0;font-size:0.9rem;color:var(--gray-700)}
-  .callout code{font-family:var(--font-mono);background:oklch(97% 0.0288 82.6);padding:1px 6px;border-radius:4px;color:var(--warning-700)}
+  .callout{background:var(--bg-cool);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:8px}
+  .callout .big{font-family:var(--semi);font-weight:700;font-size:1.06rem;color:var(--ink)}
+  .kpi-bad{color:var(--bad);font-weight:700}.kpi-good{color:var(--good);font-weight:700}
 
-  /* prompts */
-  .prompts{display:grid;gap:14px}
-  .prompt{border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-2);overflow:hidden;background:var(--surface)}
-  .prompt .ph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 16px;background:var(--bg-subtle);border-bottom:1px solid var(--border)}
-  .prompt .step{font-size:0.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--blue-700);background:var(--blue-50);padding:3px 9px;border-radius:var(--radius-pill)}
-  .prompt .why{font-size:0.8rem;color:var(--fg-subtle);margin-left:auto}
-  .prompt pre{margin:0;padding:14px 16px;font-family:var(--font-mono);font-size:0.8rem;line-height:1.55;color:var(--gray-800);white-space:pre-wrap;word-break:break-word}
-  .prompt pre .c{color:var(--teal-700)}
+  footer{padding:30px 0 50px;color:var(--muted);font-size:.84rem}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+  .chip{font-size:.74rem;font-family:var(--mono);background:var(--bg-cool);border:1px solid var(--line);
+    border-radius:99px;padding:3px 10px;color:var(--ink-2)}
 
-  /* lessons */
-  .lessons{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  @media(max-width:760px){.lessons{grid-template-columns:1fr}}
-  .lessons h3 [data-lucide]{vertical-align:-4px;margin-right:6px}
-  .learn h3 [data-lucide]{color:var(--blue-600)} .improve h3 [data-lucide]{color:var(--amber-700)}
-  .lz{list-style:none;margin:16px 0 0;padding:0}
-  .lz li{padding:14px 0;border-top:1px solid var(--border)} .lz li:first-child{border-top:0}
-  .lz li b{display:block;font-weight:600;margin-bottom:3px}
-  .lz li span{color:var(--fg-muted);font-size:0.92rem}
-
-  /* explore */
-  .links{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-  @media(max-width:620px){.links{grid-template-columns:1fr}}
-  a.link{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-2);padding:18px;background:var(--surface);transition:box-shadow var(--dur-base),transform var(--dur-base)}
-  a.link:hover{box-shadow:var(--shadow-8);transform:translateY(-2px);text-decoration:none}
-  a.link .ico{flex:0 0 auto;width:40px;height:40px;display:grid;place-items:center;border-radius:var(--radius-sm);background:var(--surface-tint);color:var(--blue-700)}
-  a.link .ico [data-lucide]{width:20px;height:20px}
-  a.link .body{display:flex;flex-direction:column}
-  a.link .t{display:block;font-family:var(--font-display);font-weight:600;color:var(--fg)}
-  a.link .d{display:block;font-size:0.88rem;color:var(--fg-muted);margin-top:4px;line-height:1.45}
-
-  /* footer */
-  footer{background:var(--blue-950);color:oklch(91.3% 0.0328 238.2);padding:40px 0}
-  footer a{color:#fff} footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
-  footer .mono{font-family:var(--font-mono);font-size:0.8rem;color:oklch(82.7% 0.0663 235.5)}
-
-  .reveal{opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease-out),transform .5s var(--ease-out)}
-  .reveal.in{opacity:1;transform:none}
-  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+  @media(max-width:780px){
+    .hero h1{font-size:2rem}
+    .statband{grid-template-columns:repeat(2,1fr)}
+    .ipo,.twocol,.prompts{grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
 
-<header class="site" id="hdr">
-  <div class="wrap row">
-    <a class="brand" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo" aria-label="Datapot Analytics — Fabric agent demo on GitHub">
-      <img class="logo" src="assets/datapot-logo.png" alt="Datapot Analytics" width="103" height="26">
-      <span class="sub">· Fabric agent demo</span>
-    </a>
-    <nav class="hnav">
-      <a class="lnk" href="#process">Process</a>
-      <a class="lnk" href="#log">Debug log</a>
-      <a class="lnk" href="#cost">Cost</a>
-      <a class="lnk" href="#prompts">Prompts</a>
-      <a class="btn btn-primary" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo"><i data-lucide="git-branch"></i> View on GitHub</a>
-    </nav>
+<header class="hero">
+  <div class="wrap">
+    <div class="brandrow"><span class="dot"></span> Datapot · Fabric Agent Demo</div>
+    <div class="eyebrow" style="margin-top:18px">Build session recap · 2026-06-27</div>
+    <h1>Report 01 — VanArsdel Sales&nbsp;Analytics</h1>
+    <p class="lede">How Claude Code took the VanArsdel sample from <b style="color:#fff">two raw Excel files</b> to a documented, themed, validated <b style="color:#fff">Power BI report</b> — the input, the process, the output, what it cost, and what we learned.</p>
+
+    <div class="statband">
+      <div class="stat"><div class="n">9</div><div class="l">deliverables (7 docs + PBIP + contract)</div></div>
+      <div class="stat"><div class="n">9<span class="u"> tbl</span></div><div class="l">semantic-model tables</div></div>
+      <div class="stat"><div class="n">20</div><div class="l">explicit DAX measures</div></div>
+      <div class="stat"><div class="n">5<span class="u"> pg</span> · 43</div><div class="l">report pages · visuals</div></div>
+      <div class="stat"><div class="n">1.36<span class="u">M</span></div><div class="l">agent tokens (measured)</div></div>
+      <div class="stat"><div class="n">≈ $25–40</div><div class="l">estimated cost</div></div>
+    </div>
   </div>
 </header>
 
-<div class="hero">
-  <span class="dots" aria-hidden="true"></span>
-  <div class="wrap inner">
-    <p class="eyebrow reveal">Build recap</p>
-    <h1 class="reveal">A banking Power BI report, built by an AI agent — as reviewable code.</h1>
-    <p class="lead reveal">Over one working session, Claude Code took an empty folder to a validated, three-page
-      <b>Branch &amp; Channel Performance</b> report on Microsoft Fabric — authored entirely as diff-able
-      <b>PBIP</b> (TMDL + PBIR), profiled against a 100% AI-generated dataset, and <span class="hl">opened cleanly in Power BI Desktop</span>.
-      This is the story: what went in, how it went, what broke, and what it cost.</p>
-    <div class="meta reveal">
-      <span class="chip"><b>Session</b> 16 Jun 2026</span>
-      <span class="chip"><b>Agent</b> Claude Opus 4.8 (Claude Code)</span>
-      <span class="chip"><b>Stack</b> Power BI PBIP · Microsoft Fabric</span>
-      <span class="chip ok">Opens &amp; validates in Desktop</span>
-    </div>
-    <div class="cta-row reveal">
-      <a class="btn btn-onbrand" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo"><i data-lucide="git-branch"></i> View the repository</a>
-      <a class="btn btn-onbrand-ghost" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo/tree/main/reports/01-branch-channel-performance"><i data-lucide="bar-chart-3"></i> Explore report 01</a>
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">01</span><h2>What we built</h2></div>
+    <p class="intro">A new self-contained report folder in a Power BI / Microsoft Fabric monorepo — authored as diff-able <b>PBIP</b> (TMDL semantic model + PBIR report) and backed by a full set of analyst deliverables. The classic <b>VanArsdel</b> sales sample (100% synthetic): ~675K unit-level sales for 2015–2020 plus a 2020–2021 budget/forecast plan.</p>
+
+    <div class="ipo">
+      <div class="card">
+        <div class="tag"><b style="background:var(--blue)"></b>Input</div>
+        <ul>
+          <li><b>VanArsdel_Actuals.xlsx</b> (32&nbsp;MB) — Date · Campaign · Customer · Product · Geo · <b>Sales</b></li>
+          <li><b>VanArsdel_Budget_Forecast.xlsx</b> — wide budget/forecast sheet</li>
+          <li>Repo conventions, shared templates &amp; the <b>Datapot theme</b></li>
+          <li>The brief: Part 1 + Part 2 deliverables, then build the report</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag"><b style="background:var(--warn)"></b>Process</div>
+        <ul>
+          <li><b>Profile-first</b> ground truth before any modeling</li>
+          <li>Two <b>multi-agent workflows</b> (author + verify, then remediate)</li>
+          <li>Hand-authored <b>TMDL</b>; <b>code-generated</b> PBIR</li>
+          <li>Engine-level <b>validation</b> + post-open fixes</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag"><b style="background:var(--good)"></b>Output</div>
+        <ul>
+          <li><b>Part 1:</b> business glossary · data dictionary (+CSV) · data gaps &amp; questions</li>
+          <li><b>Part 2:</b> BRD · report spec · wireframe</li>
+          <li>Support: data profile · model design · dataset contract · build log</li>
+          <li><b>PBIP:</b> semantic model + 5-page report, Datapot theme — opens &amp; refreshes in Desktop</li>
+        </ul>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <section>
   <div class="wrap">
-    <div class="stats">
-      <div class="stat reveal"><div class="n">1</div><div class="k">Report shipped</div></div>
-      <div class="stat reveal"><div class="n">10</div><div class="k">Model tables</div></div>
-      <div class="stat reveal"><div class="n">22</div><div class="k">DAX measures</div></div>
-      <div class="stat reveal"><div class="n">3 <small>/ 31</small></div><div class="k">Pages / visuals</div></div>
-      <div class="stat reveal"><div class="n">183</div><div class="k">Source files profiled</div></div>
-      <div class="stat reveal"><div class="n">0</div><div class="k">Validation errors</div></div>
-    </div>
-  </div>
-</section>
-
-<section class="tint" id="io">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Scope</p>
-      <h2>What went in, what came out</h2>
-      <p class="sub">The brief, the raw materials, and the deliverables.</p>
-    </div>
-    <div class="grid2">
-      <div class="card lift reveal">
-        <h3><i data-lucide="log-in" class="ic"></i> Input</h3>
-        <ul class="tick">
-          <li><i data-lucide="check"></i><span><b>Brief</b> — design a repo for many reports over time; start with a banking report; each report keeps its own dataset, document, and dictionary.</span></li>
-          <li><i data-lucide="check"></i><span><b>Starting point</b> — an empty repo on Windows, plus the Skills-for-Fabric and Power BI agentic skill plugins.</span></li>
-          <li><i data-lucide="check"></i><span><b>Data (mid-session)</b> — a synthetic "BankDIAD" sample: transactions, NPS, targets, balances, and dimension workbooks, monthly across 2023–2025.</span></li>
-        </ul>
-      </div>
-      <div class="card lift out reveal">
-        <h3><i data-lucide="log-out" class="ic"></i> Output</h3>
-        <ul class="tick">
-          <li><i data-lucide="check"></i><span><b>Repo system</b> — conventions, a report lifecycle, a shared Datapot theme, templates, and a registry.</span></li>
-          <li><i data-lucide="check"></i><span><b>Semantic model</b> — a TMDL import model: 3 facts, 6 dimensions, 22 measures, 11 relationships.</span></li>
-          <li><i data-lucide="check"></i><span><b>Report</b> — three PBIR pages (Overview, Channel Performance, Branch Scorecard); 31 visuals; opens &amp; refreshes in Desktop.</span></li>
-          <li><i data-lucide="check"></i><span><b>Docs</b> — dataset contract, data dictionary, data profile, model design, and a build log.</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="process">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Process</p>
-      <h2>How it happened</h2>
-      <p class="sub">Six phases — a real sequence, each gated by a check or a decision.</p>
-    </div>
+    <div class="sec-head"><span class="sec-no">02</span><h2>The process, step by step</h2></div>
     <div class="phases">
-      <div class="phase reveal"><div class="idx">1</div><div><div class="role">Research</div><h3>Learn the toolkit and the format</h3><p>Read the Skills-for-Fabric structure and recommended flow, plus the exact PBIP / TMDL / PBIR rules from the installed plugins.</p></div></div>
-      <div class="phase reveal"><div class="idx">2</div><div><div class="role">Design</div><h3>Scaffold the multi-report repo</h3><p>One self-contained folder per report — dataset, dictionary, docs, and the PBIP project — plus conventions, a shared brand theme, and templates.</p></div></div>
-      <div class="phase reveal"><div class="idx">3</div><div><div class="role">Draft</div><h3>Propose a model, then pause</h3><p>Built a first-pass star schema and a minimal Overview page — then asked the right question: profile the real data before committing to the model?</p></div></div>
-      <div class="phase reveal"><div class="idx">4</div><div><div class="role">Profile &amp; reconcile</div><h3>Rebuild the model to the real schema</h3><p>Profiled the pasted BankDIAD files and rebuilt the model to match reality. Balance and loan tables were set aside for future reports.</p></div></div>
-      <div class="phase reveal"><div class="idx">5</div><div><div class="role">Debug</div><h3>Make it open in Power BI Desktop</h3><p>The longest phase — a chain of errors that only Desktop's strict parser raised, while every command-line validator reported success. See the log below.</p></div></div>
-      <div class="phase reveal"><div class="idx">6</div><div><div class="role">Confirm &amp; build</div><h3>Sign off the design, then build pages 2 &amp; 3</h3><p>Confirmed the purpose, story, and layout first, then built Channel Performance and Branch Scorecard — 23 visuals across the two pages.</p></div></div>
+      <div class="phase"><div class="pt"><span class="k">P1</span>Recon &amp; gate</div>
+        <div class="pd">Read the repo + <code>skills-for-fabric</code> structure/workflow; confirmed it is built for <b>multi-report</b> development; then <b>waited</b> for the dataset before any data work.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P2</span>Scaffold</div>
+        <div class="pd">Created <code>reports/01-VanArsdel-analytics/</code> mirroring the repo's report structure (dataset · dictionary · docs · pbip) from the shared templates.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P3</span>Profile the data <span class="pill flow">ground truth</span></div>
+        <div class="pd">pandas/openpyxl: 675,368 sales rows, <b>0 orphan keys</b>, and the findings that shaped everything — date sheet misses 16.6% of rows, <code>Units</code> is always 1, <b>no revenue column</b> (derive from price/cost), a uniform <b>27% margin</b>, and an actuals∕budget overlap of only <b>Jan–Jun 2020</b>.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P4</span>Author Part 1 &amp; Part 2 <span class="pill flow">workflow · 14 agents</span></div>
+        <div class="pd">Fanned out 7 documents from a single <b>canonical backbone</b> (one source of truth for names, DAX, numbers), then <b>adversarially verified</b> each against the profile. 3/7 clean, 4 flagged.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P5</span>Remediate <span class="pill flow">workflow · 11 agents</span></div>
+        <div class="pd">Fixed the verifier findings (measure count 21→20, project-name drift, a Device-vs-Channel mix-up, a broken ASCII schema diagram) and re-verified the four majors.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P6</span>Build the semantic model</div>
+        <div class="pd">Hand-authored <b>TMDL</b> to the repo's conventions: 2 facts + 6 dims (calculated 2015–2021 calendar, conformed <b>Product Group</b>, snowflake Customer→Geo), 8 relationships, 20 measures.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P7</span>Build the report</div>
+        <div class="pd">A deterministic <b>Python generator</b> emitted perfectly-formed PBIR — 5 pages, 43 visuals — from a single vetted PBIR schema. No hand-typed JSON, no agent drift.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P8</span>Validate without the CLIs</div>
+        <div class="pd">The repo's validators weren't installed, so we used Power BI's own <b>TOM</b> library (model parsed clean — the real "will it open" test) + a <b>Power Query replay</b> in pandas (0 orphans, measures reconcile) + a DAX/binding check.</div></div>
+      <div class="phase"><div class="pt"><span class="k">P9</span>Post-open fixes <span class="pill warnp">after Desktop refresh</span></div>
+        <div class="pd">Real issues surfaced on first open: the Budget-vs-Actual page read a misleading <span class="kpi-bad">295.8%</span> → fixed with a page filter to the valid overlap (<span class="kpi-good">97.7%</span>); explained the flat 27% margin; improved slicers; re-synced the theme; reconciled every doc to the as-built report.</div></div>
     </div>
   </div>
 </section>
 
-<section class="tint" id="log">
+<section>
   <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">The interesting part</p>
-      <h2>The debug log</h2>
-      <p class="sub">Every blocker hit while getting the project to open. All four were invisible to <span class="mono">tmdl-validate</span>, <span class="mono">pbir validate</span>, and <span class="mono">validate_pbip</span> — <span class="hl">only Power BI Desktop caught them</span>.</p>
+    <div class="sec-head"><span class="sec-no">03</span><h2>Debug log — what broke, and the fix</h2></div>
+    <p class="intro">The issues that actually came up during the build, and how each was resolved. Most surfaced from running real tools against real data — not from reading the spec.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th class="num">#</th><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Workflow script wouldn't parse (error at 11:24)</td><td>A <code>String.raw</code> literal ended in a backslash, which escaped the closing backtick</td><td>Switched the embedded Windows paths to ordinary escaped strings (<code>"C:\\…"</code>)</td></tr>
+          <tr><td class="num">2</td><td>Two stray TMDL files appeared at the repo root</td><td>Path slips while hand-authoring TMDL</td><td>Deleted them and rewrote to the correct report folder</td></tr>
+          <tr><td class="num">3</td><td>4 of 7 authored docs failed adversarial verification</td><td>Measure-count drift (21→20), project-name drift, a Device-vs-Channel mix-up, a disconnected ASCII schema diagram</td><td>Remediation workflow + manual diagram rewrite, then re-verified</td></tr>
+          <tr><td class="num">4</td><td>Repo validators wouldn't run</td><td><code>tmdl-validate</code> / <code>pbir</code> / <code>validate_pbip.py</code> not installed in the environment</td><td>Validated with Power BI's own <b>TOM</b> library + a pandas Power Query replay</td></tr>
+          <tr><td class="num">5</td><td>Refresh-replay mis-split a column</td><td>pandas <code>.str.split("):")</code> treated <code>):</code> as a regex</td><td>Added <code>regex=False</code> (replay only — the model was correct)</td></tr>
+          <tr><td class="num">6</td><td>First Desktop open errored on the data path</td><td><code>DataFolder</code> still at its committed placeholder</td><td>Set the parameter to the local <code>dataset/raw</code>, then refreshed</td></tr>
+          <tr><td class="num">7</td><td>Budget-vs-Actual page read <span class="kpi-bad">295.8%</span></td><td>6 years of actuals compared against ~6 months of budget</td><td>Page filter to the Jan–Jun 2020 overlap → <span class="kpi-good">97.7%</span></td></tr>
+          <tr><td class="num">8</td><td>Gross Margin % was a flat 27% on every row</td><td>Data artifact — a uniform cost-to-price ratio in the synthetic sample (not a bug)</td><td>Confirmed against the data; documented next to the KPI</td></tr>
+          <tr><td class="num">9</td><td>Desktop rewrote files with CRLF and a real absolute <code>DataFolder</code> path on save</td><td>Power BI Desktop normalizes on save</td><td>CRLF is harmless; restored the <code>DataFolder</code> placeholder before commit</td></tr>
+        </tbody>
+      </table>
     </div>
-    <div class="log">
-      <div class="card reveal">
-        <div class="top"><span class="t">A description comment broke the model</span><span class="pill ok"><i data-lucide="check"></i> Resolved</span></div>
-        <div class="err">TMDL Format Error: InvalidLineType — Unexpected line type: Empty · ./relationships, line 2</div>
-        <div class="cf">
-          <div><div class="lab">Root cause</div><div class="h">A <span class="mono">///</span> description followed by a blank line.</div><p>TMDL requires a description to sit immediately above the object it documents.</p></div>
-          <div class="fix"><div class="lab">Fix</div><div class="h">Removed the orphaned comment.</div><p>Audited all 14 TMDL files for the pattern; normalized to LF, UTF-8, no BOM.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">04</span><h2>Cost — time &amp; tokens</h2></div>
+    <p class="intro">Hard numbers where they were metered (the two background workflows); the main agent loop is estimated. Pricing is Claude <b>Opus&nbsp;4.8</b> list rate: <b>$5</b> / 1M input, <b>$25</b> / 1M output. Prompt caching lowers the effective input cost in practice.</p>
+
+    <div class="twocol" style="align-items:start">
+      <div>
+        <h3>Tokens &amp; estimated spend</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Item</th><th class="num">Tokens</th><th class="num">Agents</th><th class="num">Est. USD</th></tr></thead>
+            <tbody>
+              <tr><td>Authoring workflow <span style="color:var(--muted)">(measured)</span></td><td class="num">865,811</td><td class="num">14</td><td class="num">~$9</td></tr>
+              <tr><td>Remediation workflow <span style="color:var(--muted)">(measured)</span></td><td class="num">498,708</td><td class="num">11</td><td class="num">~$6</td></tr>
+              <tr><td>Main agent loop <span style="color:var(--muted)">(estimated)</span></td><td class="num">~1.5–3M</td><td class="num">1</td><td class="num">~$10–25</td></tr>
+              <tr class="total"><td>Total (estimate)</td><td class="num">~3–4M</td><td class="num">25+</td><td class="num">~$25–40</td></tr>
+            </tbody>
+          </table>
         </div>
+        <p class="cost-note">Workflow token counts are exact (reported by the orchestrator). The main-loop figure is a reasoned estimate — file reads, the PBIP build, doc edits, ~50 turns, and two large reference skills loaded near the end. Treat the total as an order-of-magnitude, not an invoice.</p>
       </div>
-      <div class="card reveal">
-        <div class="top"><span class="t">Comments aren't allowed at the TMDL root</span><span class="pill ok"><i data-lucide="check"></i> Resolved</span></div>
-        <div class="err">TMDL Format Error: InvalidLineType — Unexpected line type: Other · ./expressions, line 1</div>
-        <div class="cf">
-          <div><div class="lab">Root cause</div><div class="h"><span class="mono">//</span> comments are rejected outside an expression body.</div><p>Introduced while fixing the first error — the parser does not accept bare comments at the root.</p></div>
-          <div class="fix"><div class="lab">Fix</div><div class="h">Removed all root-level comments.</div><p>Descriptions live in the data dictionary instead; the rule is now recorded in the repo's agent guide.</p></div>
+      <div>
+        <h3>Time</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Activity</th><th class="num">Duration</th></tr></thead>
+            <tbody>
+              <tr><td>Authoring workflow (background, metered)</td><td class="num">7.3 min</td></tr>
+              <tr><td>Remediation workflow (background, metered)</td><td class="num">4.9 min</td></tr>
+              <tr><td>↳ metered background compute</td><td class="num">~12.3 min</td></tr>
+              <tr><td>Main agent loop — profile · TMDL · PBIR gen · validate · ~60 turns <span style="color:var(--muted)">(not metered)</span></td><td class="num">the bulk</td></tr>
+              <tr class="total"><td>End-to-end session — 09:40 → 13:50, incl. human steps</td><td class="num">~4h 10m</td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      <div class="card reveal">
-        <div class="top"><span class="t">A theme property was missing — and it cascaded</span><span class="pill ok"><i data-lucide="check"></i> Resolved</span></div>
-        <div class="err">Required property 'reportVersionAtImport' was not included in /themeCollection of report.json</div>
-        <div class="cf">
-          <div><div class="lab">Root cause</div><div class="h">Theme entries missing a required field.</div><p>Desktop rejected report.json, which cascaded into a misleading "the report has no pages".</p></div>
-          <div class="fix"><div class="lab">Fix</div><div class="h">Added <span class="mono">reportVersionAtImport</span> to both themes.</div><p>The page errors disappeared — they were a side effect, not a real page problem.</p></div>
-        </div>
-      </div>
-      <div class="card feature reveal">
-        <div class="top"><span class="t">The breakthrough: folder names with a dot</span><span class="pill ok"><i data-lucide="check"></i> Resolved</span></div>
-        <div class="err">ActivePageName not found · The report has no pages. Reports must have at least one page.</div>
-        <div class="cf">
-          <div><div class="lab">Root cause</div><div class="h">Page folders named <span class="mono">Overview.Page</span>.</div><p>PBIR folder names must be word characters only. The dot makes them non-compliant, so Desktop silently ignores the folder — while every command-line tool still "saw" three pages.</p></div>
-          <div class="fix"><div class="lab">Fix</div><div class="h">Renamed to <span class="mono">Overview</span> (no suffix).</div><p>Confirmed against Microsoft's PBIR documentation. This was <span class="hl">the real blocker the whole time</span>.</p></div>
+        <p class="cost-note">Only the two background workflows were timed (~12.3 min combined) — that is <b>not</b> the project total. It excludes the main agent loop (profiling, hand-authoring the TMDL, generating the PBIR, validating, ~60 turns) and the human-in-the-loop steps (pasting data, opening Desktop, refreshing, reviewing). End to end, the working session ran from <b>09:40 to 13:50 on 2026-06-27 — about 4h&nbsp;10m</b> of wall-clock.</p>
+        <div class="callout" style="margin-top:16px">
+          <div class="eyebrow">Efficiency move</div>
+          <div class="big" style="margin-top:4px">43 report visuals were written by a ~250-line Python generator, not by the model.</div>
+          <p style="margin:.4em 0 0;color:var(--ink-2);font-size:.9rem">Generating repetitive PBIR JSON in code instead of as LLM output saved a large amount of tokens and removed an entire class of hand-typing errors.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="cost">
+<section>
   <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Cost</p>
-      <h2>What it cost</h2>
-      <p class="sub">Rough estimates — confirm the exact figure with <span class="mono">/cost</span> in Claude Code.</p>
-    </div>
-    <div class="cost">
-      <div class="card feature reveal">
-        <div class="estimate"><span class="c">$</span>18–30 <span style="font-size:1.1rem;color:var(--fg-muted);font-weight:600">est.</span></div>
-        <p class="muted" style="margin-top:14px">Wall-clock <b style="color:var(--fg)">≈ 3–4 hours</b> of interactive work, including round-trips to test in Power BI Desktop. Most of the spend — and most of the time — went to phase 5, the debug chain, not to modeling or layout.</p>
-        <div class="callout"><i data-lucide="info"></i><p>This is an estimate, not a bill. Token usage depends heavily on prompt caching. Run <code>/cost</code> in the session for the real number.</p></div>
-      </div>
-      <div class="card reveal">
-        <h3 style="margin-bottom:10px">How the estimate is built</h3>
-        <table class="brk">
-          <tr><td>Output tokens (TMDL, JSON, docs, replies)</td><td class="r">~100–140k</td></tr>
-          <tr><td>Input + cached context (heavy reads, re-runs)</td><td class="r">~3–5M</td></tr>
-          <tr><td>Opus 4.8 rate assumption (out / in)</td><td class="r">$75 / $15 per M</td></tr>
-          <tr><td>Cache reads (~10% of input rate)</td><td class="r">applied</td></tr>
-          <tr><td>Estimated total</td><td class="r" style="color:var(--amber-700)">$18–30</td></tr>
-        </table>
-        <p class="muted" style="font-size:0.85rem;margin-top:14px">Biggest driver: iterative Desktop debugging — pasting errors, reading references, re-validating. A reusable template would cut most of it.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="tint" id="prompts">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Reuse</p>
-      <h2>Prompts worth reusing</h2>
-      <p class="sub">The inputs that actually moved the work forward — copy, adapt, reuse.</p>
-    </div>
+    <div class="sec-head"><span class="sec-no">05</span><h2>Useful prompts, by step</h2></div>
+    <p class="intro">Reusable prompt shapes that drove each phase — paste-and-adapt for the next report.</p>
     <div class="prompts">
-      <div class="prompt reveal"><div class="ph"><span class="step">Kickoff</span><span class="why">sets scope and a reusable structure in one shot</span></div><pre>Read the Skills-for-Fabric repo, understand the structure and recommended
-workflow. Design this repo for multiple-report development. Start with the
-1st report (banking). Each report should have its own folder, dataset,
-document, and dictionary for future reference.</pre></div>
-      <div class="prompt reveal"><div class="ph"><span class="step">Quality gate</span><span class="why">profile-before-model — prevented a wrong model</span></div><pre>Should we wait for the sample data and profile it before starting the report?</pre></div>
-      <div class="prompt reveal"><div class="ph"><span class="step">Debug loop</span><span class="why">exact error text = fast, precise fixes</span></div><pre><span class="c"># Paste the verbatim Desktop error — Document, Line Number, Line</span>
-New bug, fix please:
-TMDL Format Error: InvalidLineType … Document './expressions' …</pre></div>
-      <div class="prompt reveal"><div class="ph"><span class="step">Persistence</span><span class="why">keeps the agent iterating to a clean open</span></div><pre>Still errors, please fix till the end.</pre></div>
-      <div class="prompt reveal"><div class="ph"><span class="step">Design gate</span><span class="why">sign off intent before any visuals are built</span></div><pre>Continue with the 2 remaining pages — but confirm the business purpose,
-story, and layout with me first, before you build.</pre></div>
+      <div class="pc"><div class="h"><span class="s">P1</span><span class="t">Recon &amp; hold</span></div>
+        <div class="b">Read this repo and the skills-for-fabric structure &amp; workflow. Check it's designed for multiple-report development. <span class="q">Before any data validation, docs, or report — wait for me to paste the dataset.</span></div></div>
+      <div class="pc"><div class="h"><span class="s">P2</span><span class="t">Scaffold</span></div>
+        <div class="b">Create a second report folder with the same structure as the first so I can copy the data in.</div></div>
+      <div class="pc"><div class="h"><span class="s">P3</span><span class="t">Profile first</span></div>
+        <div class="b">Profile the pasted data before modeling: row counts, columns &amp; types, distinct values, date ranges, and referential integrity. Write it to data-profile.md as ground truth.</div></div>
+      <div class="pc"><div class="h"><span class="s">P4</span><span class="t">Author + verify</span></div>
+        <div class="b">Author Part 1 (glossary, dictionary, gaps) and Part 2 (BRD, spec, wireframe) from one canonical backbone, then adversarially verify each doc against the profile (numbers, measure names, DAX).</div></div>
+      <div class="pc"><div class="h"><span class="s">P6</span><span class="t">Build to mirror</span></div>
+        <div class="b">Build the PBIP — semantic model + report — mirroring the repo's report structure and conventions.</div></div>
+      <div class="pc"><div class="h"><span class="s">P8</span><span class="t">Verify for real</span></div>
+        <div class="b">The official CLIs aren't installed — validate with Power BI's own TOM library and a Power Query replay so we know it actually opens and refreshes.</div></div>
+      <div class="pc"><div class="h"><span class="s">P9</span><span class="t">Fix from the data</span></div>
+        <div class="b">Fix the Budget-vs-Actual page (it shows a meaningless 295.8%); apply the Datapot theme; check the docs match the shared templates.</div></div>
+      <div class="pc"><div class="h"><span class="s">★</span><span class="t">Keep docs honest</span></div>
+        <div class="b">Reconcile every document to what was actually built — flag and fix any spec-vs-build drift.</div></div>
     </div>
   </div>
 </section>
 
-<section id="lessons">
+<section>
   <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Takeaways</p>
-      <h2>Lessons, and what to improve</h2>
-      <p class="sub">What we would tell the next person building a PBIP report with an agent.</p>
-    </div>
-    <div class="lessons">
-      <div class="card learn reveal">
-        <h3><i data-lucide="lightbulb"></i>What we learned</h3>
-        <ul class="lz">
-          <li><b>Profile real data before you model.</b><span>The domain-assumption schema did not survive contact with the real export. The first model was a proposal, not the answer.</span></li>
-          <li><b>Command-line validators are lenient; Desktop is the judge.</b><span>Three tools reported success while Desktop still refused to open the file. Test in Desktop early.</span></li>
-          <li><b>"No pages" usually is not a page problem.</b><span>It was a non-compliant folder name, and once a cascade from a bad theme property.</span></li>
-          <li><b>Paste the exact error every time.</b><span>Document, line number, and line made each fix surgical instead of guesswork.</span></li>
-        </ul>
+    <div class="sec-head"><span class="sec-no">06</span><h2>Lessons learned &amp; what to improve</h2></div>
+    <div class="twocol">
+      <div>
+        <h3 style="margin-bottom:12px">What worked / what bit us</h3>
+        <div class="lessons">
+          <div class="lesson good"><h4>Profile before you model</h4><p>The date gap, <code>Units≡1</code>, the missing revenue column, the uniform margin and the budget overlap all came from profiling — each one changed the model. Domain assumptions would have shipped a wrong model.</p></div>
+          <div class="lesson good"><h4>Canonical backbone + adversarial verify</h4><p>Giving 7 doc-writers one shared source of truth (names · DAX · numbers) and then a skeptical verifier per doc kept the set consistent and caught real drift before a human saw it.</p></div>
+          <div class="lesson good"><h4>Generate repetitive artifacts in code</h4><p>A deterministic Python generator for 45 PBIR visuals beat hand-writing JSON — faster, cheaper, and drift-free.</p></div>
+          <div class="lesson bad"><h4>Structure ≠ correctness</h4><p>The 295.8% Budget bug passed <em>every</em> structural check. Only running the measures against the data exposed it. Verify visuals against the numbers, not just the schema.</p></div>
+          <div class="lesson bad"><h4>Spec ↔ build drift erodes trust</h4><p>The first docs promised maps and a scatter the build didn't include. Docs that describe what wasn't built are worse than terse ones — keep them in lock-step.</p></div>
+          <div class="lesson"><h4>Validate with the real engine</h4><p>With the repo CLIs missing, TOM (the parser Desktop itself uses) + a Power Query replay was far stronger evidence than JSON-shape checks.</p></div>
+        </div>
       </div>
-      <div class="card improve reveal">
-        <h3><i data-lucide="wrench"></i>What to improve</h3>
-        <ul class="lz">
-          <li><b>Keep a known-good PBIP template.</b><span>Clone a report that already obeys every Desktop rule instead of hand-authoring from scratch.</span></li>
-          <li><b>Add a "Desktop-strict" pre-commit check.</b><span>Catch root comments, dotted page folders, missing theme properties, and BOMs before they reach Desktop.</span></li>
-          <li><b>Make profile-first a standard step.</b><span>Bake the cycle — paste data, profile, reconcile, build — into the report lifecycle.</span></li>
-          <li><b>Use ASCII-only working paths.</b><span>A non-ASCII clone path triggered false positives from a validation hook.</span></li>
-        </ul>
+      <div>
+        <h3 style="margin-bottom:12px">Suggestions for next time</h3>
+        <ol class="imp">
+          <li><b>Install the official PBIP CLIs</b> (<code>tmdl-validate</code>, <code>pbir</code>, <code>validate_pbip.py</code>) in the environment, plus a headless refresh harness, so validation is native — not a workaround.</li>
+          <li><b>Add a data-sanity / default-filter check</b> that runs the headline measures against the data. It would have flagged the 295.8% attainment automatically, before a human opened the file.</li>
+          <li><b>Add a spec↔build reconciliation step</b> (ideally in CI) that diffs the report spec / wireframe against the visuals actually present in the PBIR.</li>
+          <li><b>Build a reusable PBIR visual-template library</b> so the next report's generator starts from vetted card / line / matrix / slicer blocks.</li>
+          <li><b>Promote the "profile → canonical backbone → author → verify" flow into a repo skill</b> so every new report runs the same vetted pipeline.</li>
+          <li><b>Treat the parameterized data path as a feature</b> — keep the <code>DataFolder</code> placeholder committed; the evaluator sets it and refreshes.</li>
+        </ol>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="tint" id="explore">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Go deeper</p>
-      <h2>Explore the repository</h2>
-      <p class="sub">Everything here is open source (MIT) and built on 100% synthetic data. Clone it, open the report, or read how it is organized.</p>
-    </div>
-    <div class="links">
-      <a class="link reveal" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo"><span class="ico"><i data-lucide="git-branch"></i></span><span class="body"><span class="t">The repository</span><span class="d">Multi-report PBIP monorepo — model, report, docs, conventions. Star it to follow new reports.</span></span></a>
-      <a class="link reveal" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo/tree/main/reports/01-branch-channel-performance"><span class="ico"><i data-lucide="bar-chart-3"></i></span><span class="body"><span class="t">Report 01 — Branch &amp; Channel Performance</span><span class="d">The semantic model, the three-page report, and its design docs. Open the .pbip in Power BI Desktop.</span></span></a>
-      <a class="link reveal" href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo/blob/main/README.md"><span class="ico"><i data-lucide="book-open"></i></span><span class="body"><span class="t">Read the README</span><span class="d">Getting started (including the PBIR preview feature), what you'll learn, and the per-report contract.</span></span></a>
-      <a class="link reveal" href="https://datapot.edu.vn"><span class="ico"><i data-lucide="graduation-cap"></i></span><span class="body"><span class="t">Learn analytics with Datapot</span><span class="d">Courses on SQL, Power BI, data modeling, and the Microsoft data platform.</span></span></a>
     </div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap row">
-    <div>
-      <div class="brand" style="color:#fff;margin-bottom:6px">
-        <span style="display:inline-flex;background:#fff;border-radius:6px;padding:3px;margin-right:2px"><img src="assets/datapot-mark.png" alt="" width="20" height="20"></span>
-        Datapot Analytics
-      </div>
-      <div class="mono">Research &amp; educational · not production · 100% synthetic data</div>
-    </div>
-    <div class="mono" style="text-align:right">
-      <a href="https://github.com/DatapotAnalytics/datapot-fabric-agent-demo">github.com/DatapotAnalytics/datapot-fabric-agent-demo</a><br>
-      Built with Claude Code (Opus 4.8) · recap 16 Jun 2026
+  <div class="wrap">
+    <p style="font-family:var(--semi);font-weight:700;color:var(--ink);margin-bottom:2px">Report 01 — VanArsdel Sales Analytics · status 🟢 built, opens &amp; refreshes in Power BI Desktop.</p>
+    <p style="margin-top:0">Data is 100% synthetic (the VanArsdel sample). Cost and time figures are estimates: workflow tokens/durations are measured; main-loop usage and USD totals are reasoned approximations at Opus 4.8 list pricing.</p>
+    <div class="tags">
+      <span class="chip">PBIP · TMDL + PBIR</span>
+      <span class="chip">star schema · 20 measures</span>
+      <span class="chip">multi-agent workflows</span>
+      <span class="chip">TOM-validated</span>
+      <span class="chip">Datapot theme</span>
     </div>
   </div>
 </footer>
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<script>
-  (function(){
-    if (window.lucide) lucide.createIcons();
-    var hdr=document.getElementById('hdr');
-    var onScroll=function(){ hdr.classList.toggle('scrolled', window.scrollY>8); };
-    onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
-    var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var els=document.querySelectorAll('.reveal');
-    if(rm || !('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
-    var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12,rootMargin:'0px 0px -8% 0px'});
-    els.forEach(function(e,i){e.style.transitionDelay=Math.min((i%5)*55,240)+'ms';io.observe(e);});
-  })();
-</script>
 </body>
 </html>

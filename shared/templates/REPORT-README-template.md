@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Domain** | <banking sub-domain> |
+| **Domain** | <domain / sub-domain> |
 | **Status** | 🔴 Scoping / 🟡 In progress / 🟢 Published |
 | **Owner** | <name / team> |
 | **Audience** | <who reads it and what decisions it supports> |

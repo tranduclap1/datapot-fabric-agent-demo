@@ -6,13 +6,13 @@ Conventions that keep every report consistent and reviewable. Applies to all rep
 
 | Thing | Convention | Example |
 |-------|------------|---------|
-| Report folder | `reports/NN-kebab-case/` (zero-padded ordinal) | `reports/01-branch-channel-performance/` |
-| PBIP project files | PascalCase, no spaces | `BranchChannelPerformance.pbip` |
-| Semantic model item | `<Project>.SemanticModel` | `BranchChannelPerformance.SemanticModel` |
-| Report item | `<Project>.Report` | `BranchChannelPerformance.Report` |
-| Page folder | `<PageName>` — **word characters/hyphens only, NO `.Page` suffix** | `Overview` |
-| Visual folder | `<VisualName>` — **word characters/hyphens only, NO `.Visual` suffix** | `Card_Transactions` |
-| Source data files | `snake_case.csv` matching the dataset contract | `channel_activity.csv` |
+| Report folder | `reports/NN-kebab-case/` (zero-padded ordinal) | `reports/01-VanArsdel-analytics/` |
+| PBIP project files | PascalCase, no spaces | `VanArsdelSales.pbip` |
+| Semantic model item | `<Project>.SemanticModel` | `VanArsdelSales.SemanticModel` |
+| Report item | `<Project>.Report` | `VanArsdelSales.Report` |
+| Page folder | `<PageName>` — **word characters/hyphens only, NO `.Page` suffix** | `ExecutiveOverview` |
+| Visual folder | `<VisualName>` — **word characters/hyphens only, NO `.Visual` suffix** | `Card_Revenue` |
+| Source data files | as named in the dataset contract (`snake_case.csv` or workbook sheets) | `VanArsdel_Actuals.xlsx` |
 
 **PBIR identity rule:** `pages.json` pageOrder entry == page folder name == `page.json` `name`, and the
 folder name must be **word characters or hyphens only (no dots/spaces)**. Power BI Desktop *silently
@@ -45,9 +45,9 @@ reports/NN-name/
 
 - **Star schema.** Dimensions on the one-side filter facts on the many-side; relationships single-direction
   unless a documented reason requires bidirectional.
-- **Friendly model names, snake_case sources.** Model columns are Title Case with spaces (`Branch Name`);
-  each maps to a `snake_case` `sourceColumn` (`branch_name`) — the physical column you paste. The dataset
-  contract lists the `snake_case` names.
+- **Friendly model names, snake_case sources.** Model columns are Title Case with spaces (`Customer Name`);
+  each maps to a `sourceColumn` (`customer_name`) — the physical column you paste. The dataset
+  contract lists the source names.
 - **Surrogate keys hidden.** `*_key` columns are `isHidden` + `isKey` on dimensions.
 - **Fact columns hidden.** Facts expose nothing directly; all analysis is via measures.
 - **All measures live on `Key Measures`**, a disconnected calculated table, grouped by numbered
@@ -64,7 +64,7 @@ reports/NN-name/
 - Page size **1280×720**; title textbox at the top (y 24, h 72); place visuals at **y ≥ 120**; no overlaps.
 - Prefer **theme formatting** (`shared/themes/datapot-theme.json`, registered per report) over per-visual overrides.
 - KPI cards → trend (line/area) → breakdown (bar/column) → detail (table/matrix). Slicers grouped together.
-- Visual titles state the *differentiator* ("by Channel", "by Month"); the page title states the subject.
+- Visual titles state the *differentiator* ("by Category", "by Month"); the page title states the subject.
 
 ## 5. Data dictionary format
 

@@ -12,7 +12,7 @@ local-first PBIP workflow where source data is pasted into the report folder.
 
 ## 1. Scope the report
 Capture audience, decisions to support, KPIs, and the grain of analysis in `docs/report-spec.md`.
-Decide the banking sub-domain and the dimensions/facts needed.
+Decide the sub-domain and the dimensions/facts needed.
 
 ## 2. Write the dataset contract
 In `dataset/DATASET-CONTRACT.md`, list every file the report needs and its columns
@@ -42,8 +42,8 @@ Useful here: the `semantic-models:power-query` skill (preview partition data) an
 - Validate: `tmdl-validate <file>.tmdl`.
 
 ## 6. Build the report (PBIR)
-- Finalize the pages defined in `docs/report-spec.md` (Overview is scaffolded; Channel Performance
-  and Branch Scorecard are placeholders awaiting profiled data).
+- Finalize the pages defined in `docs/report-spec.md`, building each page's visuals in the standard
+  order (KPI cards → trend → breakdown → detail).
 - Bind visuals to measures (never raw columns). Format through the shared theme.
 
 ## 7. Validate & review

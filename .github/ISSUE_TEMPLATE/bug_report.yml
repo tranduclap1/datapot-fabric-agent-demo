@@ -5,7 +5,7 @@ body:
   - type: input
     attributes:
       label: Which report / folder?
-      placeholder: reports/01-branch-channel-performance
+      placeholder: reports/01-VanArsdel-analytics
     validations:
       required: true
   - type: textarea

@@ -1,0 +1,7 @@
+expression DataFolder = "C:\path\to\datapot-fabric-agent-demo\reports\01-VanArsdel-analytics\dataset\raw" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 6b54970b-3a56-46c3-94b7-981d45ef3846
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+

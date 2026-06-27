@@ -1,0 +1,96 @@
+table Geo
+	lineageTag: 9c202a54-d1e2-4f24-a84b-e8c6cc3b7d08
+
+	column ZIP
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 7083c5f4-10f6-4350-86b2-2abd0ca635a2
+		dataCategory: PostalCode
+		summarizeBy: none
+		sourceColumn: Zip
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 7a3707b5-9033-41f5-a2d8-dabf7ae489bc
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 731b1185-2a01-41a3-9721-1afd5d34c7b8
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: ab82b351-9c73-4167-8dc3-26f000a2a722
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column District
+		dataType: string
+		lineageTag: c9a4a572-5718-4a64-917c-773be22fee55
+		summarizeBy: none
+		sourceColumn: District
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		isHidden
+		lineageTag: 4446b8ef-dd20-4599-a133-6648c49dcf59
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Geography
+		lineageTag: ce90daac-e535-4919-b702-e54ffca5dd67
+
+		level Region
+			lineageTag: 4dbd4614-1164-44b4-940a-0b73cb7f27b2
+			column: Region
+
+		level State
+			lineageTag: 232f7a93-c051-4333-8522-0cacd074aca2
+			column: State
+
+		level District
+			lineageTag: bc3b010f-7617-42df-9197-0517d11c9d3e
+			column: District
+
+		level City
+			lineageTag: e5268466-e0f9-48bd-b995-44bcb7ed1175
+			column: City
+
+	partition Geo = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\VanArsdel_Actuals.xlsx"), null, true),
+				    Sheet = Source{[Item="Geo", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"Zip", type text},
+				        {"City", type text},
+				        {"State", type text},
+				        {"Region", type text},
+				        {"District", type text},
+				        {"Country", type text}
+				    })
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

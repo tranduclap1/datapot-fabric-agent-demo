@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "a392b2d3a674446e8cbe",
+  "position": {
+    "x": 24,
+    "y": 560,
+    "z": 7000,
+    "height": 146,
+    "width": 620,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Comparison period = Jan–Jun 2020, the only window where actuals and budget overlap (actuals end 2020-06-30; 2020 H2 and all of 2021 are plan-only). Cards/matrix show like-for-like attainment (~97.7%). Change or clear the 'Comparison period' page filter to explore other windows. Rural-Productivity has actuals but no budget (blank Budget/variance).",
+                    "textStyle": {
+                      "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
+                      "fontSize": "10pt",
+                      "color": "#7B1FA2"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,66 @@
+table Customer
+	lineageTag: f0b14209-77a2-4f1b-be08-767b3a7eb79d
+
+	column 'Customer ID'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: ac22bea0-0d67-4d6c-a566-341741467a83
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: 39486f52-7c5c-4441-8a53-80d71009534b
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		isHidden
+		lineageTag: 56accf23-db32-419e-b14c-4e94e556e072
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZIP
+		dataType: string
+		isHidden
+		lineageTag: 16ee7168-72b3-4066-b97f-c5052ce9c4b8
+		summarizeBy: none
+		sourceColumn: ZipCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Email Name'
+		dataType: string
+		lineageTag: 6683eb09-1fde-407a-ac22-903e4c475552
+		summarizeBy: none
+		sourceColumn: Email Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\VanArsdel_Actuals.xlsx"), null, true),
+				    Sheet = Source{[Item="Customer", Kind="Sheet"]}[Data],
+				    Promoted = Table.PromoteHeaders(Sheet, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {
+				        {"CustomerID", type text},
+				        {"ZipCode", type text},
+				        {"Email Name", type text}
+				    }),
+				    AddEmail = Table.AddColumn(Typed, "Email", each Text.Trim(Text.BetweenDelimiters([Email Name], "(", ")")), type text),
+				    AddName = Table.AddColumn(AddEmail, "Customer Name", each Text.Trim(Text.AfterDelimiter([Email Name], "):")), type text)
+				in
+				    AddName
+
+	annotation PBI_ResultType = Table
+

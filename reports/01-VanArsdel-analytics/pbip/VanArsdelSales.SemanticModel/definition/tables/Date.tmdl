@@ -1,0 +1,118 @@
+table Date
+	lineageTag: 609eb77e-c031-48e2-8186-4f83f71f2bc5
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd mmm yyyy
+		lineageTag: efa0c858-c11b-4fbf-ac6b-7fc575d0d645
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		lineageTag: 7ecb6234-46b5-41e1-ad91-03af5856da67
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 2e626dac-eb2d-4269-b942-81c64fef6927
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Quarter No'
+		dataType: int64
+		isHidden
+		lineageTag: 40c55cd1-c126-4fcb-8c60-4932826b5e8c
+		summarizeBy: none
+		sourceColumn: Quarter No
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		lineageTag: 89a0f462-87f9-4480-838a-0bd0bf4dfcf2
+		summarizeBy: none
+		sourceColumn: Month Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 7e1c3ffb-029d-45f7-b10e-b130914f2a6d
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 7c868016-7644-4d14-863c-a903752d3d52
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: MonthID
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthID
+		dataType: int64
+		isHidden
+		lineageTag: 925c25f0-f5e8-4566-9439-7822011106d2
+		summarizeBy: none
+		sourceColumn: MonthID
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Calendar
+		lineageTag: 1dc3556a-0d29-41ef-a5c6-3a22cfe1e5bc
+
+		level Year
+			lineageTag: ec0c4f86-6678-4d76-b959-fbbac3c024f0
+			column: Year
+
+		level Quarter
+			lineageTag: 5e71c230-3fe5-4c17-974f-f594bb1af5c1
+			column: Quarter
+
+		level Month
+			lineageTag: 51da1037-4656-4cde-bd5f-15689f6849ed
+			column: 'Month Name'
+
+		level Date
+			lineageTag: 6ed5de2c-23f2-42b4-81a5-74e94334ce32
+			column: Date
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Start = #date(2015, 1, 1),
+				    End = #date(2021, 12, 31),
+				    Count = Duration.Days(End - Start) + 1,
+				    Source = List.Dates(Start, Count, #duration(1, 0, 0, 0)),
+				    ToTable = Table.FromList(Source, Splitter.SplitByNothing(), {"Date"}),
+				    TypeDate = Table.TransformColumnTypes(ToTable, {{"Date", type date}}),
+				    AddYear = Table.AddColumn(TypeDate, "Year", each Date.Year([Date]), Int64.Type),
+				    AddQNo = Table.AddColumn(AddYear, "Quarter No", each Date.QuarterOfYear([Date]), Int64.Type),
+				    AddQuarter = Table.AddColumn(AddQNo, "Quarter", each "Q" & Text.From([Quarter No]), type text),
+				    AddMNo = Table.AddColumn(AddQuarter, "Month Number", each Date.Month([Date]), Int64.Type),
+				    AddMName = Table.AddColumn(AddMNo, "Month Name", each Date.ToText([Date], "MMM", "en-US"), type text),
+				    AddMonth = Table.AddColumn(AddMName, "Month", each Date.ToText([Date], "MMM-yy", "en-US"), type text),
+				    AddMonthID = Table.AddColumn(AddMonth, "MonthID", each Date.Year([Date]) * 100 + Date.Month([Date]), Int64.Type)
+				in
+				    AddMonthID
+
+	annotation PBI_ResultType = Table
+

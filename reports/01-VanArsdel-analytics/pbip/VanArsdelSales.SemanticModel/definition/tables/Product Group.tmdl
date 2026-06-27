@@ -1,0 +1,54 @@
+table 'Product Group'
+	lineageTag: 5f54ad94-b684-49ad-b0df-7eb1dfe09d4d
+
+	column Category-Segment
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 4ef9b2b2-0475-4e80-9c6f-b9e9d8641cba
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Category-Segment]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 82b70be3-33df-4ea1-b9e0-4a5071122cf7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Category]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: bc4fb979-2e8c-404f-a960-4d8817a7c6f7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Segment]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Product Group' = calculated
+		mode: import
+		source =
+				DISTINCT (
+				    UNION (
+				        SELECTCOLUMNS (
+				            Product,
+				            "Category-Segment", Product[Category-Segment],
+				            "Category", Product[Category],
+				            "Segment", Product[Segment]
+				        ),
+				        SELECTCOLUMNS (
+				            Budget,
+				            "Category-Segment", Budget[Category-Segment],
+				            "Category", Budget[Category],
+				            "Segment", Budget[Segment]
+				        )
+				    )
+				)
+
+	annotation PBI_ResultType = Table
+

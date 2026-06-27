@@ -31,7 +31,7 @@ jq empty <file>.json                                        # every PBIR JSON
 - The full rule set lives in [CLAUDE.md](CLAUDE.md).
 
 ## Workflow
-1. Fork and branch from `main` (e.g. `report-02-deposits`, `fix/theme-contrast`).
+1. Fork and branch from `main` (e.g. `report-02-inventory`, `fix/theme-contrast`).
 2. For a new report, follow [docs/report-lifecycle.md](docs/report-lifecycle.md).
 3. Run the validation gate above; keep it at **0 errors**.
 4. Update the registry in [reports/README.md](reports/README.md) for new reports.

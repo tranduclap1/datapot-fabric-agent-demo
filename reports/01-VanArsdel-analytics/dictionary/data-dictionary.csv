@@ -1,0 +1,75 @@
+object_type,table,model_name,source_column,data_type,hidden,key,description_or_dax
+column,Sales,Product ID,ProductID,string,yes,FK,Relates to Product (0 orphans)
+column,Sales,Date,Date,dateTime,yes,FK,Relates to Date 2015-01-01 to 2020-06-30
+column,Sales,Customer ID,CustomerID,string,yes,FK,Relates to Customer zero-padded (0 orphans)
+column,Sales,Campaign ID,CampaignID,int64,yes,FK,Relates to Campaign (0 orphans)
+column,Sales,Units,Units,int64,yes,,Units sold constant 1 so row count equals units
+column,Budget,Type,Type,string,yes,,Plan type Budget or Forecast
+column,Budget,Year,Year,int64,yes,,Plan year 2020 or 2021
+column,Budget,Month Name,Month,string,yes,,Month abbreviation as supplied
+column,Budget,Date,,dateTime,yes,FK,Derived month-start date relates to Date
+column,Budget,Category-Segment,,string,yes,FK,Derived unpivoted key relates to Product Group
+column,Budget,Category,,string,yes,,Derived category portion of unpivoted key
+column,Budget,Segment,,string,yes,,Derived segment portion of unpivoted key
+column,Budget,Amount,,double,yes,,Unpivoted planned revenue value USD
+column,Date,Date,,dateTime,no,PK,Calculated calendar date relationship key
+column,Date,Year,,int64,no,,Calendar year
+column,Date,Quarter,,string,no,,Q1-Q4
+column,Date,Quarter No,,int64,yes,,1-4 sort key for Quarter
+column,Date,Month Number,,int64,yes,,1-12 sort key for Month Name
+column,Date,Month Name,,string,no,,Jan-Dec sorted by Month Number
+column,Date,Month,,string,no,,Mon-YY chronological month label
+column,Date,MonthID,,int64,yes,,YYYYMM sort key for Month
+column,Product,Product ID,ProductID,string,yes,PK,Product key
+column,Product,Product,Product,string,no,,Product display name
+column,Product,Manufacturer,Manufacturer,string,yes,,Constant VanArsdel no competitors
+column,Product,Category-Segment,,string,yes,FK,Derived relates to Product Group
+column,Product,Category,Category,string,yes,,Product category surfaced via Product Group
+column,Product,Segment,Segment,string,yes,,Product segment surfaced via Product Group
+column,Product,Unit Cost,Unit Cost,double,yes,,List unit cost USD range 15.31-149.46
+column,Product,Unit Price,Unit Price,double,yes,,List unit price USD range 20.97-204.74
+column,Product Group,Category-Segment,,string,yes,PK,Conformed key one-side of Product and Budget
+column,Product Group,Category,,string,no,,Category for slicer and matrix rows
+column,Product Group,Segment,,string,no,,Segment for slicer and matrix rows
+column,Customer,Customer ID,CustomerID,string,yes,PK,Customer key zero-padded
+column,Customer,Customer Name,,string,no,,Parsed Last First from Email Name trimmed
+column,Customer,Email,,string,yes,,Parsed email from Email Name trimmed synthetic PII
+column,Customer,ZIP,ZipCode,string,yes,FK,Relates to Geo (0 orphans)
+column,Geo,ZIP,Zip,string,yes,PK,ZIP key one-side of Customer
+column,Geo,City,City,string,no,,Composite City ST USA label
+column,Geo,State,State,string,no,,2-letter state 49 distinct
+column,Geo,Region,Region,string,no,,East Central West
+column,Geo,District,District,string,no,,District 39 distinct
+column,Geo,Country,Country,string,no,,Constant USA
+column,Campaign,Campaign ID,CampaignID,int64,yes,PK,Campaign key 1-22
+column,Campaign,Traffic Channel,TrafficChannel,string,no,,Acquisition channel trimmed Affliliate to Affiliate
+column,Campaign,Device,Device,string,no,,Device Deskop to Desktop
+column,Campaign,Channel Type,,string,no,,Derived Digital if Desktop Mobile Tablet else Offline
+measure,Key Measures,Units Sold,,,no,,SUM ( Sales[Units] )
+measure,Key Measures,Distinct Customers,,,no,,DISTINCTCOUNT ( Sales[Customer ID] )
+measure,Key Measures,Distinct Products Sold,,,no,,DISTINCTCOUNT ( Sales[Product ID] )
+measure,Key Measures,Revenue,,,no,,SUMX ( Sales Sales[Units] * RELATED ( Product[Unit Price] ) )
+measure,Key Measures,Cost,,,no,,SUMX ( Sales Sales[Units] * RELATED ( Product[Unit Cost] ) )
+measure,Key Measures,Gross Margin,,,no,,[Revenue] - [Cost]
+measure,Key Measures,Gross Margin %,,,no,,DIVIDE ( [Gross Margin] [Revenue] )
+measure,Key Measures,Average Selling Price,,,no,,DIVIDE ( [Revenue] [Units Sold] )
+measure,Key Measures,Revenue per Customer,,,no,,DIVIDE ( [Revenue] [Distinct Customers] )
+measure,Key Measures,Budget,,,no,,CALCULATE ( SUM ( Budget[Amount] ) Budget[Type] = "Budget" )
+measure,Key Measures,Forecast,,,no,,CALCULATE ( SUM ( Budget[Amount] ) Budget[Type] = "Forecast" )
+measure,Key Measures,Revenue vs Budget,,,no,,[Revenue] - [Budget]
+measure,Key Measures,Revenue vs Budget %,,,no,,DIVIDE ( [Revenue] - [Budget] [Budget] )
+measure,Key Measures,Budget Attainment %,,,no,,DIVIDE ( [Revenue] [Budget] )
+measure,Key Measures,Revenue PY,,,no,,CALCULATE ( [Revenue] SAMEPERIODLASTYEAR ( Date[Date] ) )
+measure,Key Measures,Revenue YoY,,,no,,[Revenue] - [Revenue PY]
+measure,Key Measures,Revenue YoY %,,,no,,DIVIDE ( [Revenue] - [Revenue PY] [Revenue PY] )
+measure,Key Measures,Revenue YTD,,,no,,TOTALYTD ( [Revenue] Date[Date] )
+measure,Key Measures,Digital Revenue,,,no,,CALCULATE ( [Revenue] Campaign[Device] IN { "Desktop" "Mobile" "Tablet" } )
+measure,Key Measures,Digital Revenue %,,,no,,DIVIDE ( [Digital Revenue] [Revenue] )
+relationship,Sales,Date[Date],Sales[Date],,,,1-to-many single
+relationship,Sales,Product[Product ID],Sales[Product ID],,,,1-to-many single
+relationship,Sales,Customer[Customer ID],Sales[Customer ID],,,,1-to-many single
+relationship,Sales,Campaign[Campaign ID],Sales[Campaign ID],,,,1-to-many single
+relationship,Customer,Geo[ZIP],Customer[ZIP],,,,1-to-many single
+relationship,Budget,Date[Date],Budget[Date],,,,1-to-many single
+relationship,Product,Product Group[Category-Segment],Product[Category-Segment],,,,1-to-many single
+relationship,Budget,Product Group[Category-Segment],Budget[Category-Segment],,,,1-to-many single

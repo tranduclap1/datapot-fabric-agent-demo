@@ -1,0 +1,21 @@
+#,display_folder,measure,format,returns,dax,definition,depends_on
+1,01 Volume,Units Sold,"#,##0",Integer,SUM ( Sales[Units] ),"Total units sold; one Sales row = one unit, so equals the sales row count.",
+2,01 Volume,Distinct Customers,"#,##0",Integer,DISTINCTCOUNT ( Sales[Customer ID] ),Number of unique customers with at least one sale.,
+3,01 Volume,Distinct Products Sold,"#,##0",Integer,DISTINCTCOUNT ( Sales[Product ID] ),Number of unique products that recorded a sale.,
+4,02 Revenue & Profit,Revenue,"$#,##0",Currency,"SUMX ( Sales, Sales[Units] * RELATED ( Product[Unit Price] ) )",List-price (gross) sales: units x list Unit Price. No discounts/returns/tax.,
+5,02 Revenue & Profit,Cost,"$#,##0",Currency,"SUMX ( Sales, Sales[Units] * RELATED ( Product[Unit Cost] ) )",Cost of goods: units x Unit Cost.,
+6,02 Revenue & Profit,Gross Margin,"$#,##0",Currency,[Revenue] - [Cost],Revenue minus cost.,"Revenue, Cost"
+7,02 Revenue & Profit,Gross Margin %,0.0%,Percent,"DIVIDE ( [Gross Margin], [Revenue] )",Gross margin as a share of revenue.,"Gross Margin, Revenue"
+8,02 Revenue & Profit,Average Selling Price,"$#,##0.00",Currency,"DIVIDE ( [Revenue], [Units Sold] )",Revenue per unit sold.,"Revenue, Units Sold"
+9,02 Revenue & Profit,Revenue per Customer,"$#,##0",Currency,"DIVIDE ( [Revenue], [Distinct Customers] )",Average revenue per active customer.,"Revenue, Distinct Customers"
+10,03 Budget & Forecast,Budget,"$#,##0",Currency,"CALCULATE ( SUM ( Budget[Amount] ), Budget[Type] = ""Budget"" )",Planned revenue: Amount where plan Type = Budget.,
+11,03 Budget & Forecast,Forecast,"$#,##0",Currency,"CALCULATE ( SUM ( Budget[Amount] ), Budget[Type] = ""Forecast"" )",Forecast revenue: Amount where plan Type = Forecast.,
+12,03 Budget & Forecast,Revenue vs Budget,"$#,##0",Currency,[Revenue] - [Budget],Actual revenue minus budget (absolute variance).,"Revenue, Budget"
+13,03 Budget & Forecast,Revenue vs Budget %,0.0%,Percent,"DIVIDE ( [Revenue] - [Budget], [Budget] )",Variance as a share of budget.,"Revenue, Budget"
+14,03 Budget & Forecast,Budget Attainment %,0.0%,Percent,"DIVIDE ( [Revenue], [Budget] )",Actual revenue as a share of budget; 100% = on plan. Compare only on the Jan-Jun 2020 overlap.,"Revenue, Budget"
+15,04 Time Intelligence,Revenue PY,"$#,##0",Currency,"CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )",Revenue for the same period last year.,"Revenue, Date"
+16,04 Time Intelligence,Revenue YoY,"$#,##0",Currency,[Revenue] - [Revenue PY],Year-over-year revenue change (absolute).,"Revenue, Revenue PY"
+17,04 Time Intelligence,Revenue YoY %,0.0%,Percent,"DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )",Year-over-year revenue growth rate.,"Revenue, Revenue PY"
+18,04 Time Intelligence,Revenue YTD,"$#,##0",Currency,"TOTALYTD ( [Revenue], 'Date'[Date] )",Revenue accumulated from the start of the year to date.,"Revenue, Date"
+19,05 Marketing & Channel,Digital Revenue,"$#,##0",Currency,"CALCULATE ( [Revenue], Campaign[Device] IN { ""Desktop"", ""Mobile"", ""Tablet"" } )",Revenue from digital devices (Desktop/Mobile/Tablet); excludes offline Paper. Raw Deskop typo is corrected to Desktop in Power Query.,"Revenue, Campaign[Device]"
+20,05 Marketing & Channel,Digital Revenue %,0.0%,Percent,"DIVIDE ( [Digital Revenue], [Revenue] )",Digital revenue as a share of total revenue.,"Digital Revenue, Revenue"

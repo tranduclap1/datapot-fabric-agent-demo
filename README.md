@@ -11,47 +11,53 @@
 
 A Microsoft Fabric / Power BI monorepo where every semantic model and report is authored by
 **Claude Code** in diff-able **PBIP** format (TMDL + PBIR) — then validated, documented, and
-version-controlled like software. **Report 01** is a banking **Branch &amp; Channel Performance**
-dashboard built end-to-end on a 100% AI-generated dataset.
+version-controlled like software. The current report is **VanArsdel Sales Analytics**, a
+manufacturing &amp; retail **sales** dashboard built end-to-end on a 100% synthetic dataset.
 
-📖 **See exactly how it was built** — prompts, debug log, and cost: **[read the build recap](https://datapotanalytics.github.io/datapot-fabric-agent-demo/session-recap.html)** *(rendered via GitHub Pages; source in [`docs/session-recap.html`](docs/session-recap.html)).*
+📖 **See exactly how it was built** — process, prompts, and cost: **[read the build recap](https://datapotanalytics.github.io/datapot-fabric-agent-demo/session-recap.html)** *(rendered via GitHub Pages; source in [`docs/session-recap.html`](docs/session-recap.html)).*
 
-> 🔬 **Research &amp; educational use only · 100% dummy data.** Experimental; **not production-tier**
-> and not through Datapot's QA. The bundled "BankDIAD" dataset is entirely AI-generated — no real
-> people, customers, or institution. Don't use the model or numbers for real decisions. No warranty.
+> 🔬 **Research &amp; educational use only · 100% synthetic data.** Experimental; **not production-tier**
+> and not through Datapot's QA. The bundled "VanArsdel" dataset is entirely synthetic — no real
+> people, customers, or company. Don't use the model or numbers for real decisions. No warranty.
 > [Full notice ↓](#-data--status-notice)
 
 ---
 
 ## What it produces
 
-A clean, conventional **star schema** — 6 dimensions, 3 facts, and a disconnected measures table:
+A clean, conventional **star schema** — **6 dimensions**, **2 facts**, and a disconnected measures table:
 
-<p align="center">
-  <img src="docs/assets/star-schema.svg" alt="Star schema: 6 dimensions and 3 fact tables, plus a disconnected Key Measures table" width="860">
-</p>
+- **Facts:** `Sales` (one row per unit sold) · `Budget` (Type × Year × Month × Category × Segment).
+- **Dimensions:** `Date` (calculated 2015–2021 calendar) · `Product` · `Product Group` (conformed) ·
+  `Customer` · `Geo` · `Campaign`.
+- **`Key Measures`** — a disconnected table holding **20 explicit measures** (volume · revenue &amp; profit ·
+  budget &amp; forecast · time intelligence · marketing &amp; channel). See [model design](reports/01-VanArsdel-analytics/docs/model-design.md).
 
-The report has three pages — **Overview**, **Channel Performance**, and **Branch Scorecard**
-(31 visuals). Open `BranchChannelPerformance.pbip` to explore them ([Getting Started ↓](#getting-started--open--explore-report-01)),
-or skim the [build recap](docs/session-recap.html) for the visuals and story.
+The report has **five pages** — **Executive Overview**, **Product &amp; Category**, **Geography &amp; Customers**,
+**Marketing &amp; Channel**, and **Budget vs Actual** (43 visuals). Open `VanArsdelSales.pbip` to explore them
+([Getting Started ↓](#getting-started--open--explore-the-report)), or skim the
+[build recap](docs/session-recap.html) for the visuals and story.
 
 ## What you'll learn
 
 A worked, end-to-end example of **agentic analytics engineering** on the Microsoft data platform:
 
 - 🧱 **PBIP as code** — how a Power BI model + report look as reviewable TMDL/PBIR files, not a binary `.pbix`.
-- ⭐ **Star-schema modeling** — 6 dimensions, 3 facts, hidden surrogate keys, explicit measures only.
-- 🧮 **DAX measure design** — 22 measures in display folders (volume · revenue &amp; targets · service/NPS · digital adoption · time intelligence).
-- 📒 **Spec-driven, documented builds** — dataset contract → data profile → model design → report spec → build log → data dictionary.
-- 🤖 **The agent workflow** — the actual prompts, debug log, and cost ([recap](docs/session-recap.html)).
+- ⭐ **Star-schema modeling** — 6 dimensions (incl. a conformed `Product Group` and a snowflaked `Geo`),
+  2 facts, hidden surrogate keys, explicit measures only.
+- 🧮 **DAX measure design** — 20 measures in display folders (volume · revenue &amp; profit · budget &amp; forecast ·
+  time intelligence · marketing &amp; channel).
+- 📒 **Spec-driven, documented builds** — dataset contract → data profile → business glossary → data dictionary →
+  data gaps → BRD → model design → report spec → wireframe → build log.
+- 🤖 **The agent workflow** — the actual process, prompts, and cost ([recap](docs/session-recap.html)).
 - 🧰 **Reusable conventions** — folder, naming, TMDL &amp; PBIR rules that keep a multi-report repo consistent ([CONVENTIONS.md](CONVENTIONS.md)).
 
-## Getting Started — open &amp; explore Report 01
+## Getting Started — open &amp; explore the report
 
 **Prerequisites**
 - **Power BI Desktop** (latest; free from the Microsoft Store).
 - The **PBIR preview features** enabled (one-time, below) — required, or the report won't open.
-- *(Optional)* Python 3 + `openpyxl` — only to run `validate_pbip.py` or regenerate the dummy data; **not** needed to open/refresh the report.
+- *(Optional)* Python 3 + `openpyxl` — only to profile/regenerate the data; **not** needed to open/refresh the report.
 
 **1. Clone**
 ```bash
@@ -64,22 +70,24 @@ cd datapot-fabric-agent-demo
 and **Store reports using enhanced metadata format (PBIR)** → **OK** → **restart Desktop**.
 *(Skip this and Desktop may refuse to open the project or show "The report has no pages".)*
 
-**3. Open the project** — `reports/01-branch-channel-performance/pbip/BranchChannelPerformance.pbip`
+**3. Open the project** — `reports/01-VanArsdel-analytics/pbip/VanArsdelSales.pbip`
 
 **4. Point the model at your clone (required)** — the data path is parameterized. On the ribbon:
 **Home ▸ Transform data ▸ Edit parameters**, set **`DataFolder`** to the absolute path of the
 raw-data folder in *your* clone, e.g.
 ```
-C:\Users\<you>\src\datapot-fabric-agent-demo\reports\01-branch-channel-performance\dataset\raw
+C:\Users\<you>\src\datapot-fabric-agent-demo\reports\01-VanArsdel-analytics\dataset\raw
 ```
 
-**5. Refresh** — **Home ▸ Refresh**. The dummy data loads (36 monthly partitions, 2023-01 → 2025-12).
-It's 100% synthetic, so open and refresh with no privacy concerns.
+**5. Refresh** — **Home ▸ Refresh**. The synthetic data loads — `Sales` actuals **Jan 2015 → Jun 2020**
+plus a 2020–2021 budget/forecast plan. It's 100% synthetic, so open and refresh with no privacy concerns.
 
-### The three pages
-1. **Overview** — headline volume &amp; value: KPI cards (Total Transactions, Gross Transaction Value, NPS, Digital Adoption %), a monthly trend, a by-channel breakdown, and a Year slicer. *How much is flowing, and how is it trending?*
-2. **Channel Performance** — the digital shift: digital-adoption KPIs, a 100% stacked column of channel mix over time, volume &amp; average service time by channel, and a Channel × Transaction-Category matrix. *How much activity is digital, and is it growing?*
-3. **Branch Scorecard** — per-branch performance: a Region › City › Branch scorecard matrix, NPS by branch, and a detractor-reason breakdown. *Which branches lag on service, NPS, and targets?*
+### The five pages
+1. **Executive Overview** — headline KPI cards (Revenue, Gross Margin, Units Sold, Distinct Customers), a Revenue-by-month line with a prior-year overlay, Revenue by category, and Revenue by state. *How are sales, margin and volume trending?*
+2. **Product &amp; Category** — a Category › Segment matrix (Revenue, Gross Margin, GM%, Units, ASP), top products by Revenue, and a 100% stacked category mix over time. *Which products &amp; categories drive revenue and margin?*
+3. **Geography &amp; Customers** — Revenue by state and region, Distinct Customers &amp; Revenue per Customer, and a Region › State › District matrix. *Where are customers and revenue concentrated?*
+4. **Marketing &amp; Channel** — Revenue by Traffic Channel and Device, Digital Revenue %, a Channel × Device matrix, and a digital-share trend. *Which acquisition channels &amp; devices convert to revenue?*
+5. **Budget vs Actual** — Actual vs Budget cards and matrix, page-filtered to the **Jan–Jun 2020** actuals∕budget overlap (the only like-for-like window). *How does actual track to plan, where comparable?*
 
 ## Repository layout
 
@@ -90,17 +98,16 @@ datapot-fabric-agent-demo/
 ├── CONVENTIONS.md             ← naming, folder, PBIP/TMDL & dictionary standards
 ├── CONTRIBUTING.md · SECURITY.md · CODE_OF_CONDUCT.md · CHANGELOG.md · LICENSE
 ├── docs/                      ← repo-wide docs
-│   ├── report-lifecycle.md    ← design → dataset → model → report → deploy
-│   ├── business-glossary.md   ← banking terms shared across reports
+│   ├── report-lifecycle.md    ← scope → dataset → profile → model → report → deploy
 │   ├── fabric-environment.md  ← target workspaces / deployment (fill in per tenant)
-│   ├── assets/                ← diagrams (star-schema.svg)
-│   └── session-recap.html     ← how this build actually went (prompts, debug log, cost)
+│   ├── assets/                ← brand assets (logo, mark)
+│   └── session-recap.html     ← how this build actually went (process, prompts, cost)
 ├── shared/                    ← assets reused by every report
 │   ├── themes/                ← the Datapot brand Power BI theme
 │   └── templates/             ← starter files for a new report
 └── reports/                   ← ALL reports live here, one folder each
     ├── README.md              ← report registry / index
-    └── 01-branch-channel-performance/
+    └── 01-VanArsdel-analytics/
         ├── dataset/  dictionary/  docs/  pbip/   (+ README.md)
 ```
 
@@ -112,7 +119,7 @@ Each report folder always carries these four things — nothing leaks between re
 |----------------|--------------------|------------|
 | **Folder**     | `reports/NN-name/` | One numbered folder per report |
 | **Dataset**    | `dataset/`         | Source data + `DATASET-CONTRACT.md` describing the expected files/columns |
-| **Document**   | `docs/`            | `report-spec.md`, `model-design.md`, `build-log.md`, `data-profile.md` |
+| **Document**   | `docs/`            | `report-spec.md`, `model-design.md`, `build-log.md`, `data-profile.md`, plus glossary / gaps / BRD / wireframe |
 | **Dictionary** | `dictionary/`      | `data-dictionary.md` + `.csv` — every table, column, and measure defined |
 
 Power BI artifacts (semantic model + report) live in `pbip/` as source-controllable **PBIP**
@@ -122,8 +129,7 @@ Power BI artifacts (semantic model + report) live in `pbip/` as source-controlla
 
 | # | Report | Domain | Status |
 |---|--------|--------|--------|
-| 01 | [Branch &amp; Channel Performance](reports/01-branch-channel-performance/README.md) | Banking | 🟢 Complete — 3 pages; opens &amp; refreshes in Power BI Desktop |
-| 02 | _(planned)_ | _TBD_ | 🔴 Ideas welcome — [open an issue](https://github.com/DatapotAnalytics/datapot-fabric-agent-demo/issues/new/choose) |
+| 01 | [VanArsdel Sales Analytics](reports/01-VanArsdel-analytics/README.md) | Manufacturing &amp; Retail | 🟢 Built — 5 pages; opens &amp; refreshes in Power BI Desktop |
 
 New reports are added as self-contained folders over time — ⭐ **star / watch** to follow along.
 Legend: 🔴 planned · 🟡 in progress · 🟢 built. Full registry: [reports/README.md](reports/README.md).
@@ -161,14 +167,14 @@ agentic, AI-assisted analytics engineering**, shared openly so the community can
 ## Explore &amp; contribute
 
 - ⭐ **Star this repo** if the agentic-PBIP workflow is useful — it helps others find it.
-- 🔎 **Explore Report 01** → [Branch &amp; Channel Performance](reports/01-branch-channel-performance/README.md)
+- 🔎 **Explore the report** → [VanArsdel Sales Analytics](reports/01-VanArsdel-analytics/README.md)
 - 📖 **Read the build story** → [session recap](https://datapotanalytics.github.io/datapot-fabric-agent-demo/session-recap.html)
 - 🎓 **Learn analytics with us** → [datapot.edu.vn](https://datapot.edu.vn)
 - 💬 **Bug or idea?** → [open an issue](https://github.com/DatapotAnalytics/datapot-fabric-agent-demo/issues/new/choose) · see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
 
-Code is released under the [MIT License](LICENSE). The bundled BankDIAD dataset is 100% synthetic and
+Code is released under the [MIT License](LICENSE). The bundled VanArsdel dataset is 100% synthetic and
 free to reuse for learning. Documentation and report content © Datapot Analytics — reuse encouraged
 with attribution.
 
@@ -179,6 +185,6 @@ has **not** passed Datapot's own production standards / QA workflow. Structure, 
 and data may change at any time without notice. Do not rely on this repository, its model, or its
 numbers for real decisions. **No warranty; use at your own risk.**
 
-**Data:** the bundled "BankDIAD" dataset is **100% dummy, AI-generated data** — every name, date of
-birth, balance, branch, and value is fabricated for demonstration. It contains **no real, private, or
-personal data**, represents no real customers or institution, and violates no one's privacy.
+**Data:** the bundled "VanArsdel" dataset is **100% synthetic data** — every customer, product, sale,
+and value is fabricated for demonstration. It contains **no real, private, or personal data**,
+represents no real customers or company, and violates no one's privacy.

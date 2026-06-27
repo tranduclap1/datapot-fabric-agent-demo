@@ -1,0 +1,99 @@
+table Budget
+	lineageTag: db15ba93-9e95-4e73-9042-e16dd0b652c0
+
+	column Type
+		dataType: string
+		isHidden
+		lineageTag: 1d276557-530b-4e21-8508-c350f20e5c92
+		summarizeBy: none
+		sourceColumn: Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		isHidden
+		lineageTag: 4290210c-6fe9-4786-9939-984f751c7bd8
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		isHidden
+		lineageTag: 2d5f015d-3282-4378-8a5f-a8abfb77f24d
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 70905bc7-ed64-47cb-90f6-3c7fc951f330
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Category-Segment
+		dataType: string
+		isHidden
+		lineageTag: e9e856b0-700d-4097-9f9f-15e6ad9103cc
+		summarizeBy: none
+		sourceColumn: Category-Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		isHidden
+		lineageTag: 9549b27b-7e1f-496f-a721-e817be8830a0
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		isHidden
+		lineageTag: 1c7e51f1-f692-4ecb-88aa-a437e6668e4d
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: double
+		isHidden
+		formatString: \$#,##0
+		lineageTag: 9b84f036-8310-48c2-b1c7-059cac8fac96
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Budget = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFolder & "\VanArsdel_Budget_Forecast.xlsx"), null, true),
+				    Sheet = Source{[Item="Sheet1", Kind="Sheet"]}[Data],
+				    SkipBanner = Table.Skip(Sheet, 1),
+				    Promoted = Table.PromoteHeaders(SkipBanner, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Type", type text}, {"Year", Int64.Type}, {"Month", type text}}),
+				    Unpivot = Table.UnpivotOtherColumns(Typed, {"Type", "Year", "Month"}, "Category-Segment", "Amount"),
+				    DupKey = Table.DuplicateColumn(Unpivot, "Category-Segment", "CS Split"),
+				    SplitCS = Table.SplitColumn(DupKey, "CS Split", Splitter.SplitTextByEachDelimiter({"-"}, QuoteStyle.Csv, false), {"Category", "Segment"}),
+				    MonthMap = [Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, Jun = 6, Jul = 7, Aug = 8, Sep = 9, Oct = 10, Nov = 11, Dec = 12],
+				    AddDate = Table.AddColumn(SplitCS, "Date", each #date([Year], Record.Field(MonthMap, [Month]), 1), type date),
+				    Final = Table.TransformColumnTypes(AddDate, {{"Amount", type number}, {"Category", type text}, {"Segment", type text}, {"Category-Segment", type text}})
+				in
+				    Final
+
+	annotation PBI_ResultType = Table
+

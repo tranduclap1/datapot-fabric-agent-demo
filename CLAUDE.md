@@ -62,7 +62,7 @@ The bundled `tmdl-validate` linter is lightweight and misses several rules that 
 - A block **header is immediately followed by a property or child**, not a blank line
   (e.g. `table X` then `column …`, or `table X` then `lineageTag: …`).
 - **LF line endings, UTF-8, no BOM** — match the exported reference; a BOM breaks line 1.
-- Quote names with spaces/parens/`%`/leading digit: `'Amount (VND)'`, `'NPS Surveys'`, `'Digital Adoption %'`.
+- Quote names with spaces/parens/`%`/leading digit: `'Unit Price'`, `'Product Group'`, `'Gross Margin %'`.
 - Tabs only for indentation. To keep model docs, put descriptions in the data dictionary, not inline.
 
 After any TMDL edit, run `tmdl-validate` **and** re-read for the rules above (the linter won't catch them).
