@@ -14,7 +14,7 @@ A Microsoft Fabric / Power BI monorepo where every semantic model and report is 
 version-controlled like software. The current report is **VanArsdel Sales Analytics**, a
 manufacturing &amp; retail **sales** dashboard built end-to-end on a 100% synthetic dataset.
 
-📖 **See exactly how it was built** — process, prompts, and cost: **[read the build recap](https://datapotanalytics.github.io/datapot-fabric-agent-demo/session-recap.html)** *(rendered via GitHub Pages; source in [`docs/session-recap.html`](docs/session-recap.html)).*
+📖 **See exactly how it was built** — process, prompts, and cost: **[read the build recap](docs/session-recap.html)** *(open `docs/session-recap.html` in a browser for the full rendered recap).*
 
 > 🔬 **Research &amp; educational use only · 100% synthetic data.** Experimental; **not production-tier**
 > and not through Datapot's QA. The bundled "VanArsdel" dataset is entirely synthetic — no real
@@ -168,7 +168,7 @@ agentic, AI-assisted analytics engineering**, shared openly so the community can
 
 - ⭐ **Star this repo** if the agentic-PBIP workflow is useful — it helps others find it.
 - 🔎 **Explore the report** → [VanArsdel Sales Analytics](reports/01-VanArsdel-analytics/README.md)
-- 📖 **Read the build story** → [session recap](https://datapotanalytics.github.io/datapot-fabric-agent-demo/session-recap.html)
+- 📖 **Read the build story** → [session recap](docs/session-recap.html)
 - 🎓 **Learn analytics with us** → [datapot.edu.vn](https://datapot.edu.vn)
 - 💬 **Bug or idea?** → [open an issue](https://github.com/DatapotAnalytics/datapot-fabric-agent-demo/issues/new/choose) · see [CONTRIBUTING.md](CONTRIBUTING.md)
 
